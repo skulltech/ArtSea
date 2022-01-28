@@ -1,14 +1,16 @@
-import { Button, Input, TextInput } from "@mantine/core";
+import { Button, TextInput } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { useForm } from "@mantine/hooks";
 import { ethers } from "ethers";
 import { create } from "ipfs-http-client";
+import { useState } from "react";
 
 import abi from "./utils/NFT.json";
 
 export const MintNFTForm = ({ currentAccount }) => {
+  const [minting, setMinting] = useState(false);
   const nftContractAddress = "0x4C7915eE75fe27C802363e79179708a19C7E779A";
-  const nftContractAbi = abi;
+  const nftContractAbi = abi.abi;
 
   const getNftContract = () => {
     const { ethereum } = window;
@@ -45,22 +47,33 @@ export const MintNFTForm = ({ currentAccount }) => {
   });
 
   const handleFormSubmit = async (values) => {
-    console.log(values);
-    const imageUrl = await uploadToIpfs(values.image);
-    console.log("Image uploaded to IPFS at:", imageUrl);
-    const metadata = {
-      name: values.name,
-      description: values.description,
-      image: imageUrl,
-    };
-    const metadataUrl = await uploadToIpfs(JSON.stringify(metadata));
-    console.log("Metadata uploaded to IPFS at:", metadataUrl);
+    setMinting(true);
 
-    const nftContract = getNftContract();
-    const txn = nftContract.createToken(metadataUrl);
-    console.log("Transaction is:", txn);
-    const tokenId = await txn.wait();
-    console.log("Transaction done, token ID:", tokenId);
+    try {
+      const imageUrl = await uploadToIpfs(values.image);
+      console.log("Image uploaded to IPFS at:", imageUrl);
+      const metadata = {
+        name: values.name,
+        description: values.description,
+        image: imageUrl,
+      };
+      const metadataUrl = await uploadToIpfs(JSON.stringify(metadata));
+      console.log("Metadata uploaded to IPFS at:", metadataUrl);
+
+      const nftContract = getNftContract();
+      let txn = await nftContract.createToken(metadataUrl);
+      console.log("Transaction hash for minting the NFT:", txn.hash);
+      const receipt = await txn.wait();
+      const transferEvent = receipt.events?.filter((x) => {
+        return x.event === "Transfer";
+      })[0];
+      const tokenId = transferEvent.args[2].toString();
+      console.log("Transaction done, minted token ID:", tokenId);
+    } catch (err) {
+      console.log(err);
+    }
+
+    setMinting(false);
   };
 
   const handleDropzoneDrop = (files) => {
@@ -78,7 +91,9 @@ export const MintNFTForm = ({ currentAccount }) => {
       <Dropzone onDrop={handleDropzoneDrop} multiple={false}>
         {() => null}
       </Dropzone>
-      <Button type="submit">Submit</Button>
+      <Button type="submit" loading={minting}>
+        Submit
+      </Button>
     </form>
   );
 };
