@@ -17,7 +17,7 @@ export const ConnectWalletButton = ({ currentAccount, setCurrentAccount }) => {
     return accounts[0];
   };
 
-  const buttonOnClick = async () => {
+  const handleButtonClick = async () => {
     setConnecting(true);
     const account = await connectAccount();
     setCurrentAccount(account);
@@ -26,7 +26,7 @@ export const ConnectWalletButton = ({ currentAccount, setCurrentAccount }) => {
 
   return (
     <Button
-      onClick={buttonOnClick}
+      onClick={handleButtonClick}
       loading={connecting}
       color={currentAccount && "green"}
     >

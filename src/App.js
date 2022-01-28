@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import "./App.css";
 import { ConnectWalletButton } from "./ConnectWalletButton";
+import { MintNFTForm } from "./Mint";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -31,6 +32,7 @@ export default function App() {
         currentAccount={currentAccount}
         setCurrentAccount={setCurrentAccount}
       />
+      <MintNFTForm currentAccount={currentAccount} />
     </div>
   );
 }

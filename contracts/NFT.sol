@@ -10,10 +10,9 @@ import "hardhat/console.sol";
 contract NFT is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
-    address marketplaceAddress;
 
-    constructor(address marketplaceAddr) ERC721("Metaverse Tokens", "METT") {
-        marketplaceAddress = marketplaceAddr;
+    constructor() ERC721("Metaverse Tokens", "METT") {
+        console.log("Constructed NFT contract.");
     }
 
     function createToken(string memory tokenURI) public returns (uint) {
@@ -22,7 +21,6 @@ contract NFT is ERC721URIStorage {
 
         _mint(msg.sender, newItemId);
         _setTokenURI(newItemId, tokenURI);
-        setApprovalForAll(marketplaceAddress, true);
         return newItemId;
     }
 }
