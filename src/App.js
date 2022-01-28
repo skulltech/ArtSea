@@ -1,25 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState, useEffect } from "react";
+import "./App.css";
+import { ConnectWalletButton } from "./ConnectWalletButton";
 
-function App() {
+export default function App() {
+  const [currentAccount, setCurrentAccount] = useState(null);
+
+  const checkIfWalletIsConnected = async () => {
+    const { ethereum } = window;
+    if (!ethereum) {
+      console.log("Metamask is not installed");
+      return false;
+    }
+    const accounts = await ethereum.request({ method: "eth_accounts" });
+    if (!accounts.length) {
+      console.log("No authorized accounts found");
+      return false;
+    }
+    console.log("Authorized account found:", accounts[0]);
+    setCurrentAccount(accounts[0]);
+    return true;
+  };
+
+  useEffect(() => {
+    checkIfWalletIsConnected();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ConnectWalletButton
+        currentAccount={currentAccount}
+        setCurrentAccount={setCurrentAccount}
+      />
     </div>
   );
 }
-
-export default App;
