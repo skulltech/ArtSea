@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { ConnectWalletButton } from "./ConnectWalletButton";
-import { MintNFTForm } from "./Mint";
+import { ConnectWallet } from "./ConnectWallet";
+import { MintNFT } from "./MintNFT";
+import { AppShell, Header, Group, Text } from "@mantine/core";
+import { TargetIcon } from "@modulz/radix-icons";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -27,12 +29,24 @@ export default function App() {
   }, []);
 
   return (
-    <div className="App">
-      <ConnectWalletButton
-        currentAccount={currentAccount}
-        setCurrentAccount={setCurrentAccount}
-      />
-      <MintNFTForm currentAccount={currentAccount} />
-    </div>
+    <AppShell
+      padding="md"
+      header={
+        <Header height={60} padding="xs">
+          <Group position="apart">
+            <Group>
+              <TargetIcon />
+              <Text weight="bold">NFT Marketplace</Text>
+            </Group>
+            <ConnectWallet
+              currentAccount={currentAccount}
+              setCurrentAccount={setCurrentAccount}
+            />
+          </Group>
+        </Header>
+      }
+    >
+      <MintNFT currentAccount={currentAccount} />
+    </AppShell>
   );
 }

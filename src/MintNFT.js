@@ -1,15 +1,23 @@
-import { Button, TextInput } from "@mantine/core";
+import {
+  Button,
+  Container,
+  Group,
+  TextInput,
+  Text,
+  Image,
+} from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { useForm } from "@mantine/hooks";
+import { ImageIcon } from "@modulz/radix-icons";
 import { ethers } from "ethers";
 import { create } from "ipfs-http-client";
 import { useState } from "react";
 
 import abi from "./utils/NFT.json";
 
-export const MintNFTForm = ({ currentAccount }) => {
+export const MintNFT = ({ currentAccount }) => {
   const [minting, setMinting] = useState(false);
-  const nftContractAddress = "0x4C7915eE75fe27C802363e79179708a19C7E779A";
+  const nftContractAddress = "0x9aC000EEDD21A8bdB4362f27FC9D6dA33B016B31";
   const nftContractAbi = abi.abi;
 
   const getNftContract = () => {
@@ -30,9 +38,9 @@ export const MintNFTForm = ({ currentAccount }) => {
 
   const uploadToIpfs = async (file) => {
     const ipfsClient = create({
-      host: "ipfs.infura.io",
-      port: "5001",
-      apiPath: "/api/v0",
+      host: process.env.IPFS_HOST,
+      port: 5001,
+      apiPath: process.env.IPFS_PATH,
     });
     const { cid } = await ipfsClient.add({ content: file });
     return "https://ipfs.io/ipfs/" + cid;
@@ -81,19 +89,41 @@ export const MintNFTForm = ({ currentAccount }) => {
   };
 
   return (
-    <form onSubmit={form.onSubmit(handleFormSubmit)}>
-      <TextInput required label="Name" {...form.getInputProps("name")} />
-      <TextInput
-        required
-        label="Description"
-        {...form.getInputProps("description")}
-      />
-      <Dropzone onDrop={handleDropzoneDrop} multiple={false}>
-        {() => null}
-      </Dropzone>
-      <Button type="submit" loading={minting}>
-        Submit
-      </Button>
-    </form>
+    <Container>
+      <form onSubmit={form.onSubmit(handleFormSubmit)}>
+        <Group direction="column" position="center" grow={true}>
+          <TextInput required label="Name" {...form.getInputProps("name")} />
+          <TextInput
+            required
+            label="Description"
+            {...form.getInputProps("description")}
+          />
+          <Dropzone onDrop={handleDropzoneDrop} multiple={false}>
+            {() => (
+              <Group position="center" direction="column">
+                {form.values.image ? (
+                  <Image
+                    radius="md"
+                    height="400px"
+                    src={URL.createObjectURL(form.values.image)}
+                    alt="Image to mint an NFT of"
+                    withPlaceholder
+                  />
+                ) : (
+                  <ImageIcon style={{ height: 80, width: 80 }} />
+                )}
+                <Text weight="semibold">
+                  Drag image here or click to select file
+                </Text>
+              </Group>
+            )}
+          </Dropzone>
+          <Button type="submit" loading={minting}>
+            {!minting && "Mint"}
+            {minting && "Minting"}
+          </Button>
+        </Group>
+      </form>
+    </Container>
   );
 };
