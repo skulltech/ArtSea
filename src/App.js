@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import { ConnectWallet } from "./ConnectWallet";
 import { MintNFT } from "./MintNFT";
-import { AppShell, Header, Group, Text } from "@mantine/core";
+import { AppShell, Header, Group, Text, MantineProvider } from "@mantine/core";
 import { TargetIcon } from "@modulz/radix-icons";
 
 export default function App() {
@@ -29,24 +29,32 @@ export default function App() {
   }, []);
 
   return (
-    <AppShell
-      padding="md"
-      header={
-        <Header height={60} padding="xs">
-          <Group position="apart">
-            <Group>
-              <TargetIcon />
-              <Text weight="bold">NFT Marketplace</Text>
-            </Group>
-            <ConnectWallet
-              currentAccount={currentAccount}
-              setCurrentAccount={setCurrentAccount}
-            />
-          </Group>
-        </Header>
-      }
+    <MantineProvider
+      theme={{
+        textSizes: {
+          md: "14px",
+        },
+      }}
     >
-      <MintNFT currentAccount={currentAccount} />
-    </AppShell>
+      <AppShell
+        padding="md"
+        header={
+          <Header height={60} padding="xs">
+            <Group position="apart">
+              <Group>
+                <TargetIcon />
+                <Text weight="bold">NFT Marketplace</Text>
+              </Group>
+              <ConnectWallet
+                currentAccount={currentAccount}
+                setCurrentAccount={setCurrentAccount}
+              />
+            </Group>
+          </Header>
+        }
+      >
+        <MintNFT currentAccount={currentAccount} />
+      </AppShell>
+    </MantineProvider>
   );
 }

@@ -89,7 +89,7 @@ export const MintNFT = ({ currentAccount }) => {
   };
 
   return (
-    <Container>
+    <Container size="sm">
       <form onSubmit={form.onSubmit(handleFormSubmit)}>
         <Group direction="column" position="center" grow={true}>
           <TextInput required label="Name" {...form.getInputProps("name")} />
@@ -104,7 +104,7 @@ export const MintNFT = ({ currentAccount }) => {
                 {form.values.image ? (
                   <Image
                     radius="md"
-                    height="400px"
+                    height="300px"
                     src={URL.createObjectURL(form.values.image)}
                     alt="Image to mint an NFT of"
                     withPlaceholder
