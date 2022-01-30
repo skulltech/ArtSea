@@ -1,12 +1,24 @@
 import { useState, useEffect } from "react";
 import "./App.css";
-import { ConnectWallet } from "./ConnectWallet";
-import { MintNFT } from "./MintNFT";
-import { AppShell, Header, Group, Text, MantineProvider } from "@mantine/core";
-import { TargetIcon } from "@modulz/radix-icons";
+import { ConnectWallet } from "./components/ConnectWallet";
+import { MintNft } from "./components/MintNft";
+import {
+  AppShell,
+  Header,
+  Group,
+  Text,
+  MantineProvider,
+  Tabs,
+  Container,
+} from "@mantine/core";
+import { HiOutlineCloudUpload } from "react-icons/hi";
+import { GiAtSea } from "react-icons/gi";
+import { BsListUl } from "react-icons/bs";
+import { AiOutlineShopping } from "react-icons/ai";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
+  const [activeTab, setActiveTab] = useState(1);
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -42,8 +54,8 @@ export default function App() {
           <Header height={60} padding="xs">
             <Group position="apart">
               <Group>
-                <TargetIcon />
-                <Text weight="bold">NFT Marketplace</Text>
+                <GiAtSea />
+                <Text weight="bold">ArtSea</Text>
               </Group>
               <ConnectWallet
                 currentAccount={currentAccount}
@@ -53,7 +65,15 @@ export default function App() {
           </Header>
         }
       >
-        <MintNFT currentAccount={currentAccount} />
+        <Container size="sm">
+          <Tabs activeTab={activeTab} onTabChange={setActiveTab}>
+            <Tabs.Tab label="Mint" icon={<HiOutlineCloudUpload />}>
+              <MintNft currentAccount={currentAccount} />
+            </Tabs.Tab>
+            <Tabs.Tab label="My Arts" icon={<BsListUl />}></Tabs.Tab>
+            <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}></Tabs.Tab>
+          </Tabs>
+        </Container>
       </AppShell>
     </MantineProvider>
   );
