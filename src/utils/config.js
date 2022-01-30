@@ -1,7 +1,7 @@
-import abi from "./NFT.json";
+import abi from "./ArtSeaTokens.json";
 
 const config = {
-  nftContractAddress: "0x9aC000EEDD21A8bdB4362f27FC9D6dA33B016B31",
+  nftContractAddress: "0x3f809F1f5Af1bD703067af46c85789a04cb13dA2",
   nftContractAbi: abi.abi,
 };
 

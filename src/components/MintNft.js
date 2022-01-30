@@ -42,11 +42,12 @@ export const MintNft = ({ currentAccount }) => {
       const metadataUrl = await uploadToIpfs(JSON.stringify(metadata));
       console.log("Metadata uploaded to IPFS at:", metadataUrl);
 
-      const nftContract = getNftContract();
-      let txn = await nftContract.createToken(metadataUrl);
+      const nftContract = getNftContract({ currentAccount });
+      let txn = await nftContract.safeMint(currentAccount, metadataUrl);
       console.log("Transaction hash for minting the NFT:", txn.hash);
       const receipt = await txn.wait();
-      const transferEvent = receipt.events?.filter((x) => {
+      console.log("Transaction receipt:", receipt);
+      const transferEvent = receipt.events.filter((x) => {
         return x.event === "Transfer";
       })[0];
       const tokenId = transferEvent.args[2].toString();

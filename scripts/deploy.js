@@ -2,13 +2,13 @@ const { ethers } = require("hardhat");
 const fs = require("fs");
 
 const main = async () => {
-  const nftContractFactory = await ethers.getContractFactory("NFT");
+  const nftContractFactory = await ethers.getContractFactory("ArtSeaTokens");
   const nftContract = await nftContractFactory.deploy();
   await nftContract.deployed();
   console.log("NFT contract deployed to:", nftContract.address);
   fs.copyFile(
-    "../artifacts/contracs/NFT.sol/NFT.json",
-    "../src/utils/NFT.json",
+    "../artifacts/contracts/ArtSeaTokens.sol/ArtSeaTokens.json",
+    "../src/utils/ArtSeaTokens.json",
     (err) => {
       if (err) throw err;
       console.log("Copied ABI file to React's src directory");
