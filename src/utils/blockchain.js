@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import config from "../config";
+import config from "./config";
 
 const getNftContract = ({ currentAccount }) => {
   const { ethereum } = window;
