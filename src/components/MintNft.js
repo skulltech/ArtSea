@@ -4,11 +4,24 @@ import { useForm } from "@mantine/hooks";
 import { IoImageOutline } from "react-icons/io5";
 import { create } from "ipfs-http-client";
 import { useState } from "react";
-
 import getNftContract from "../utils/blockchain";
+import { useModals } from "@mantine/modals";
+import config from "../utils/config.js";
 
 export const MintNft = ({ currentAccount }) => {
   const [minting, setMinting] = useState(false);
+  const modals = useModals();
+
+  const mintingFinishedModal = (tokenUrl) => {
+    modals.openModal({
+      title: "NFT minted",
+      children: (
+        <>
+          <Text> The url is: {tokenUrl} </Text>
+        </>
+      ),
+    });
+  };
 
   const uploadToIpfs = async (file) => {
     const ipfsClient = create({
@@ -30,6 +43,7 @@ export const MintNft = ({ currentAccount }) => {
 
   const handleFormSubmit = async (values) => {
     setMinting(true);
+    let tokenId;
 
     try {
       const imageUrl = await uploadToIpfs(values.image);
@@ -41,22 +55,23 @@ export const MintNft = ({ currentAccount }) => {
       };
       const metadataUrl = await uploadToIpfs(JSON.stringify(metadata));
       console.log("Metadata uploaded to IPFS at:", metadataUrl);
-
       const nftContract = getNftContract({ currentAccount });
       let txn = await nftContract.safeMint(currentAccount, metadataUrl);
       console.log("Transaction hash for minting the NFT:", txn.hash);
       const receipt = await txn.wait();
       console.log("Transaction receipt:", receipt);
-      const transferEvent = receipt.events.filter((x) => {
+      const transferEvent = receipt.events?.filter((x) => {
         return x.event === "Transfer";
       })[0];
-      const tokenId = transferEvent.args[2].toString();
+      tokenId = transferEvent.args[2].toString();
       console.log("Transaction done, minted token ID:", tokenId);
     } catch (err) {
       console.log(err);
     }
 
     setMinting(false);
+    const tokenUrl = `https://testnets.opensea.io/assets/mumbai/${config.nftContractAddress}/${tokenId}`;
+    mintingFinishedModal(tokenUrl);
   };
 
   const handleDropzoneDrop = (files) => {
