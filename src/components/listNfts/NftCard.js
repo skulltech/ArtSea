@@ -1,11 +1,10 @@
 import { Card, Image } from "@mantine/core";
 
-export const NftCard = () => {
+export const NftCard = ({ nftDetails }) => {
   return (
     <Card>
-      <Card.Section>
-        <Image src=""></Image>
-      </Card.Section>
+      <Card.Section></Card.Section>
+      {nftDetails.tokenURI}
     </Card>
   );
 };

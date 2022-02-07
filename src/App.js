@@ -17,6 +17,7 @@ import { BsListUl } from "react-icons/bs";
 import { AiOutlineShopping } from "react-icons/ai";
 import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
+import { ListNfts } from "./components/listNfts/ListNfts";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -74,7 +75,9 @@ export default function App() {
                 <Tabs.Tab label="Mint" icon={<HiOutlineCloudUpload />}>
                   <MintNft currentAccount={currentAccount} />
                 </Tabs.Tab>
-                <Tabs.Tab label="My Arts" icon={<BsListUl />}></Tabs.Tab>
+                <Tabs.Tab label="My Arts" icon={<BsListUl />}>
+                  <ListNfts currentAccount={currentAccount} />
+                </Tabs.Tab>
                 <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}></Tabs.Tab>
               </Tabs>
             </Container>
