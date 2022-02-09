@@ -15,7 +15,7 @@ contract ArtSeaTokens is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
 
     constructor() ERC721("ArtSea Tokens", "ARTS") {}
 
-    function safeMint(address to, string memory uri) public onlyOwner {
+    function safeMint(address to, string memory uri) public {
         uint tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);

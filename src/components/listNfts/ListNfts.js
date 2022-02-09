@@ -15,7 +15,6 @@ export const ListNfts = ({ currentAccount }) => {
   useEffect(() => {
     const fetchNfts = async () => {
       setFetchingNfts(true);
-      console.log("herllo");
 
       const nftContract = getContract({
         currentAccount,
@@ -42,7 +41,6 @@ export const ListNfts = ({ currentAccount }) => {
       setNfts(nftsOwned);
 
       setFetchingNfts(false);
-      console.log("donnene");
     };
 
     fetchNfts();

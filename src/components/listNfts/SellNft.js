@@ -31,7 +31,7 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
       tokenToSell,
       form.values.minBidAmount
     );
-    console.log("Transaction hash for minting the NFT:", txn.hash);
+    console.log("Transaction hash for creating auction:", txn.hash);
     const receipt = await txn.wait();
     console.log("Transaction receipt:", receipt);
     const auctionCreatedEvent = receipt.events?.filter((x) => {
