@@ -20,11 +20,18 @@ contract ArtSeaMarket {
     Counters.Counter auctionIds;
     Auction[] auctions;
 
+    event AuctionCreated(
+        uint auctionId,
+        address tokenAddress,
+        uint tokenId,
+        uint minBidAmount
+    );
+
     function submitAuction(
         address tokenAddress,
         uint tokenId,
         uint minBidAmount
-    ) public returns (uint) {
+    ) public {
         IERC721 token = IERC721(tokenAddress);
         address tokenOwner = token.ownerOf(tokenId);
         require(tokenOwner == msg.sender, "You do not own the NFT");
@@ -41,7 +48,8 @@ contract ArtSeaMarket {
         });
         uint newAuctionId = auctionIds.current();
         auctions.push(newAuction);
-        return newAuctionId;
+
+        emit AuctionCreated(newAuctionId, tokenAddress, tokenId, minBidAmount);
     }
 
     function submitBid(uint auctionId) public payable {

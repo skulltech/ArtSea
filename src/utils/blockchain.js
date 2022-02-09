@@ -1,7 +1,6 @@
 import { ethers } from "ethers";
-import config from "./config";
 
-const getNftContract = ({ currentAccount }) => {
+const getContract = ({ currentAccount, contractInfo }) => {
   const { ethereum } = window;
   if (!ethereum) {
     console.log("Ethereum object not found");
@@ -9,12 +8,11 @@ const getNftContract = ({ currentAccount }) => {
   }
   const provider = new ethers.providers.Web3Provider(ethereum);
   const signer = provider.getSigner(currentAccount);
-  const nftContract = new ethers.Contract(
-    config.nftContractAddress,
-    config.nftContractAbi,
+  const contract = new ethers.Contract(
+    contractInfo.contractAddress,
+    contractInfo.contractAbi,
     signer
   );
-  return nftContract;
+  return contract;
 };
-
-export default getNftContract;
+export default getContract;

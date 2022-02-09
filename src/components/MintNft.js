@@ -4,7 +4,7 @@ import { useForm } from "@mantine/hooks";
 import { IoImageOutline } from "react-icons/io5";
 import { create } from "ipfs-http-client";
 import { useState } from "react";
-import getNftContract from "../utils/blockchain";
+import getContract from "../utils/blockchain";
 import { useModals } from "@mantine/modals";
 import config from "../utils/config.js";
 
@@ -55,7 +55,10 @@ export const MintNft = ({ currentAccount }) => {
       };
       const metadataUrl = await uploadToIpfs(JSON.stringify(metadata));
       console.log("Metadata uploaded to IPFS at:", metadataUrl);
-      const nftContract = getNftContract({ currentAccount });
+      const nftContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.nftContract,
+      });
       let txn = await nftContract.safeMint(currentAccount, metadataUrl);
       console.log("Transaction hash for minting the NFT:", txn.hash);
       const receipt = await txn.wait();
@@ -63,7 +66,7 @@ export const MintNft = ({ currentAccount }) => {
       const transferEvent = receipt.events?.filter((x) => {
         return x.event === "Transfer";
       })[0];
-      tokenId = transferEvent.args[2].toString();
+      tokenId = transferEvent.args[2].toNumber();
       console.log("Transaction done, minted token ID:", tokenId);
     } catch (err) {
       console.log(err);
