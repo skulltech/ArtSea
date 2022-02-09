@@ -4,10 +4,11 @@ import { useState } from "react";
 import getContract from "../../utils/blockchain";
 import config from "../../utils/config";
 
-export const SellNft = ({ currentAccount, tokenId }) => {
+export const SellNft = ({ currentAccount, tokenToSell }) => {
   const form = useForm({
     initialValues: {
       minBidAmount: null,
+      tokenId: null,
     },
   });
   const [creatingAuction, setCreatingAuction] = useState(false);
@@ -17,11 +18,17 @@ export const SellNft = ({ currentAccount, tokenId }) => {
 
     const marketContract = getContract({
       currentAccount,
-      contractInfo: config.contracts.nftContract,
+      contractInfo: config.contracts.marketContract,
     });
+    console.log(
+      "contract address",
+      config.contracts.nftContract.contractAddress
+    );
+    console.log("toketosell", tokenToSell);
+    console.log("minbud", form.values.minBidAmount);
     const txn = await marketContract.submitAuction(
       config.contracts.nftContract.contractAddress,
-      tokenId,
+      tokenToSell,
       form.values.minBidAmount
     );
     console.log("Transaction hash for minting the NFT:", txn.hash);
@@ -30,7 +37,7 @@ export const SellNft = ({ currentAccount, tokenId }) => {
     const auctionCreatedEvent = receipt.events?.filter((x) => {
       return x.event === "AuctionCreated";
     })[0];
-    const auctionId = auctionCreatedEvent.args[0].toNumber();
+    const auctionId = auctionCreatedEvent.args[0].toString();
     console.log("Transaction done, auction ID:", auctionId);
 
     setCreatingAuction(false);

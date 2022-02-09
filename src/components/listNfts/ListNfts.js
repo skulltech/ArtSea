@@ -1,4 +1,4 @@
-import { Group, Modal } from "@mantine/core";
+import { Center, Group, Loader, Modal } from "@mantine/core";
 import { useEffect, useState } from "react";
 import getContract from "../../utils/blockchain";
 import { NftCard } from "./NftCard";
@@ -9,9 +9,14 @@ import config from "../../utils/config";
 export const ListNfts = ({ currentAccount }) => {
   const [nfts, setNfts] = useState([]);
   const [sellNftModalOpened, setSellNftModalOpened] = useState(false);
+  const [tokenToSell, setTokenToSell] = useState(null);
+  const [fetchingNfts, setFetchingNfts] = useState(false);
 
   useEffect(() => {
     const fetchNfts = async () => {
+      setFetchingNfts(true);
+      console.log("herllo");
+
       const nftContract = getContract({
         currentAccount,
         contractInfo: config.contracts.nftContract,
@@ -35,30 +40,42 @@ export const ListNfts = ({ currentAccount }) => {
       );
       console.log(nftsOwned);
       setNfts(nftsOwned);
+
+      setFetchingNfts(false);
+      console.log("donnene");
     };
 
     fetchNfts();
   }, [currentAccount]);
 
-  return (
-    <>
-      <Modal
-        opened={sellNftModalOpened}
-        onClose={() => setSellNftModalOpened(false)}
-        title="Sell NFT"
-        overlayOpacity={0.95}
-      >
-        <SellNft currentAccount={currentAccount} />
-      </Modal>
-      <Group>
-        {nfts.map((nft) => (
-          <NftCard
-            nftDetails={nft}
-            key={nft.tokenId}
-            setSellNftModalOpened={setSellNftModalOpened}
-          />
-        ))}
-      </Group>
-    </>
-  );
+  if (fetchingNfts) {
+    return (
+      <Center padding="lg">
+        <Loader />
+      </Center>
+    );
+  } else {
+    return (
+      <>
+        <Modal
+          opened={sellNftModalOpened}
+          onClose={() => setSellNftModalOpened(false)}
+          title="Sell NFT"
+          overlayOpacity={0.95}
+        >
+          <SellNft currentAccount={currentAccount} tokenToSell={tokenToSell} />
+        </Modal>
+        <Group>
+          {nfts.map((nft) => (
+            <NftCard
+              nftDetails={nft}
+              key={nft.tokenId}
+              setSellNftModalOpened={setSellNftModalOpened}
+              setTokenToSell={setTokenToSell}
+            />
+          ))}
+        </Group>
+      </>
+    );
+  }
 };

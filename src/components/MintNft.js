@@ -66,7 +66,7 @@ export const MintNft = ({ currentAccount }) => {
       const transferEvent = receipt.events?.filter((x) => {
         return x.event === "Transfer";
       })[0];
-      tokenId = transferEvent.args[2].toNumber();
+      tokenId = transferEvent.args[2].toString();
       console.log("Transaction done, minted token ID:", tokenId);
     } catch (err) {
       console.log(err);

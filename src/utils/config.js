@@ -1,14 +1,16 @@
-import abi from "./ArtSeaTokens.json";
+import tokenJson from "../data/ArtSeaTokens.json";
+import marketJson from "../data/ArtSeaMarket.json";
+import configJson from "../data/config.json";
 
 const config = {
   contracts: {
     nftContract: {
-      contractAddress: "0xEf814092C1fAb8acCa38f97DBa37FbC1ED490b2F",
-      contractAbi: abi.abi,
+      contractAddress: configJson.nftContractAddress,
+      contractAbi: tokenJson.abi,
     },
     marketContract: {
-      contractAddress: "",
-      contractAbi: null,
+      contractAddress: configJson.marketContractAddress,
+      contractAbi: marketJson.abi,
     },
   },
 };
