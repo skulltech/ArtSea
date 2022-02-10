@@ -15,7 +15,10 @@ const main = async () => {
   const configFile = await readFile("./src/data/config.json");
   const configContent = JSON.parse(configFile);
   configContent.marketContractAddress = marketContract.address;
-  await writeFile("./src/data/config.json", JSON.stringify(configContent));
+  await writeFile(
+    "./src/data/config.json",
+    JSON.stringify(configContent, null, 2)
+  );
   console.log("Modified config.json to have the new contract address.");
 };
 

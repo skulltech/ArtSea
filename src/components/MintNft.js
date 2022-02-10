@@ -1,4 +1,4 @@
-import { Button, Group, TextInput, Text, Image } from "@mantine/core";
+import { Button, Group, TextInput, Text, Image, Anchor } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { useForm } from "@mantine/hooks";
 import { IoImageOutline } from "react-icons/io5";
@@ -17,7 +17,10 @@ export const MintNft = ({ currentAccount }) => {
       title: "NFT minted",
       children: (
         <>
-          <Text> The url is: {tokenUrl} </Text>
+          <Text>You can view your NFT at: </Text>
+          <Anchor href={tokenUrl} target="_blank">
+            {tokenUrl}
+          </Anchor>
         </>
       ),
     });
@@ -73,7 +76,7 @@ export const MintNft = ({ currentAccount }) => {
     }
 
     setMinting(false);
-    const tokenUrl = `https://testnets.opensea.io/assets/mumbai/${config.nftContractAddress}/${tokenId}`;
+    const tokenUrl = `https://testnets.opensea.io/assets/mumbai/${config.contracts.nftContract.contractAddress}/${tokenId}`;
     mintingFinishedModal(tokenUrl);
   };
 
