@@ -1,6 +1,5 @@
 import { Button, Group, NumberInput } from "@mantine/core";
 import { useForm } from "@mantine/hooks";
-import { BigNumber } from "ethers";
 import { parseEther } from "ethers/lib/utils";
 import { useState } from "react";
 import getContract from "../../utils/blockchain";
