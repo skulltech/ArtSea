@@ -20,13 +20,7 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
       currentAccount,
       contractInfo: config.contracts.marketContract,
     });
-    console.log(
-      "contract address",
-      config.contracts.nftContract.contractAddress
-    );
-    console.log("toketosell", tokenToSell);
-    console.log("minbud", form.values.minBidAmount);
-    const txn = await marketContract.submitAuction(
+    const txn = await marketContract.createAuction(
       config.contracts.nftContract.contractAddress,
       tokenToSell,
       form.values.minBidAmount
@@ -50,6 +44,7 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
           placeholder="Minimum bid amount in $MATIC"
           label="Minimum bid amount in $MATIC"
           required
+          precision={18}
           {...form.getInputProps("minBidAmount")}
         />
         <Button type="submit" loading={creatingAuction}>

@@ -18,6 +18,7 @@ import { AiOutlineShopping } from "react-icons/ai";
 import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { ListNfts } from "./components/listNfts/ListNfts";
+import { ListAuctions } from "./components/buyNfts/ListAuctions";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -78,7 +79,9 @@ export default function App() {
                 <Tabs.Tab label="My Arts" icon={<BsListUl />}>
                   <ListNfts currentAccount={currentAccount} />
                 </Tabs.Tab>
-                <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}></Tabs.Tab>
+                <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
+                  <ListAuctions currentAccount={currentAccount} />
+                </Tabs.Tab>
               </Tabs>
             </Container>
           </AppShell>

@@ -18,8 +18,8 @@ contract ArtSeaMarket {
         bool sold;
     }
 
-    Counters.Counter auctionIds;
-    Auction[] auctions;
+    Counters.Counter public auctionIds;
+    Auction[] public auctions;
 
     event AuctionCreated(
         uint auctionId,
@@ -28,7 +28,7 @@ contract ArtSeaMarket {
         uint minBidAmount
     );
 
-    function submitAuction(
+    function createAuction(
         address tokenAddress,
         uint tokenId,
         uint minBidAmount
@@ -53,7 +53,7 @@ contract ArtSeaMarket {
         emit AuctionCreated(newAuctionId, tokenAddress, tokenId, minBidAmount);
     }
 
-    function submitBid(uint auctionId) public payable {
+    function placeBid(uint auctionId) public payable {
         Auction memory auction = auctions[auctionId];
         if (msg.value > auction.highestBidAmount) {
             auction.highestBidder.transfer(auction.highestBidAmount);

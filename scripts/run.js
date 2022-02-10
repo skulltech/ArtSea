@@ -35,6 +35,11 @@ const main = async () => {
   })[0];
   const auctionId = auctionCreatedEvent.args[0].toString();
   console.log("Transaction done, auction ID:", auctionId);
+
+  let auctionIds = await marketContract.connect(user).auctionIds();
+  console.log(auctionIds);
+  let auction = await marketContract.connect(user).auctions(0);
+  console.log(auction);
 };
 
 const runMain = async () => {
