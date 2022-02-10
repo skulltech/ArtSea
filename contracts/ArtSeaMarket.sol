@@ -54,11 +54,12 @@ contract ArtSeaMarket {
     }
 
     function placeBid(uint auctionId) public payable {
-        Auction memory auction = auctions[auctionId];
-        if (msg.value > auction.highestBidAmount) {
-            auction.highestBidder.transfer(auction.highestBidAmount);
-            auction.highestBidAmount = msg.value;
-            auction.highestBidder = payable(msg.sender);
+        if (msg.value > auctions[auctionId].highestBidAmount) {
+            auctions[auctionId].highestBidder.transfer(
+                auctions[auctionId].highestBidAmount
+            );
+            auctions[auctionId].highestBidAmount = msg.value;
+            auctions[auctionId].highestBidder = payable(msg.sender);
         }
     }
 
