@@ -1,7 +1,11 @@
 import { Badge, Button } from "@mantine/core";
 import { useState } from "react";
 
-export const ConnectWallet = ({ currentAccount, setCurrentAccount }) => {
+export const ConnectWallet = ({
+  currentAccount,
+  setCurrentAccount,
+  setValidNetwork,
+}) => {
   const [connecting, setConnecting] = useState(false);
 
   const connectAccount = async () => {
@@ -14,13 +18,14 @@ export const ConnectWallet = ({ currentAccount, setCurrentAccount }) => {
       method: "eth_requestAccounts",
     });
     console.log("Authorized account:", accounts[0]);
-    return accounts[0];
+    return { account: accounts[0], network: parseInt(ethereum.networkVersion) };
   };
 
   const handleButtonClick = async () => {
     setConnecting(true);
-    const account = await connectAccount();
+    const { account, network } = await connectAccount();
     setCurrentAccount(account);
+    setValidNetwork([137, 80001].includes(network));
     setConnecting(false);
   };
 

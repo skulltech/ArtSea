@@ -10,6 +10,7 @@ import {
   MantineProvider,
   Tabs,
   Container,
+  Center,
 } from "@mantine/core";
 import { HiOutlineCloudUpload } from "react-icons/hi";
 import { GiAtSea } from "react-icons/gi";
@@ -22,12 +23,16 @@ import { ListAuctions } from "./components/buyNfts/ListAuctions";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
+  const [validNetwork, setValidNetwork] = useState(false);
+  const [metamaskInstalled, setMetamaskInstalled] = useState(false);
   const [activeTab, setActiveTab] = useState(1);
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
-    if (!ethereum) {
-      console.log("Metamask is not installed");
+    if (ethereum) {
+      setMetamaskInstalled(true);
+    } else {
+      setMetamaskInstalled(false);
       return false;
     }
     const accounts = await ethereum.request({ method: "eth_accounts" });
@@ -37,12 +42,24 @@ export default function App() {
     }
     console.log("Authorized account found:", accounts[0]);
     setCurrentAccount(accounts[0]);
+    setValidNetwork([137, 80001].includes(parseInt(ethereum.networkVersion)));
     return true;
   };
 
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
+
+  useEffect(() => {
+    if (window.ethereum) {
+      window.ethereum.on("chainChanged", () => {
+        window.location.reload();
+      });
+      window.ethereum.on("accountsChanged", () => {
+        window.location.reload();
+      });
+    }
+  });
 
   return (
     <MantineProvider
@@ -63,26 +80,49 @@ export default function App() {
                     <GiAtSea />
                     <Text weight="bold">ArtSea</Text>
                   </Group>
-                  <ConnectWallet
-                    currentAccount={currentAccount}
-                    setCurrentAccount={setCurrentAccount}
-                  />
+                  {metamaskInstalled && (
+                    <ConnectWallet
+                      currentAccount={currentAccount}
+                      setCurrentAccount={setCurrentAccount}
+                      setValidNetwork={setValidNetwork}
+                    />
+                  )}
                 </Group>
               </Header>
             }
           >
             <Container size="sm">
-              <Tabs activeTab={activeTab} onTabChange={setActiveTab}>
-                <Tabs.Tab label="Mint" icon={<HiOutlineCloudUpload />}>
-                  <MintNft currentAccount={currentAccount} />
-                </Tabs.Tab>
-                <Tabs.Tab label="My Arts" icon={<BsListUl />}>
-                  <ListNfts currentAccount={currentAccount} />
-                </Tabs.Tab>
-                <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
-                  <ListAuctions currentAccount={currentAccount} />
-                </Tabs.Tab>
-              </Tabs>
+              {currentAccount && validNetwork && (
+                <Tabs activeTab={activeTab} onTabChange={setActiveTab}>
+                  <Tabs.Tab label="Mint" icon={<HiOutlineCloudUpload />}>
+                    <MintNft currentAccount={currentAccount} />
+                  </Tabs.Tab>
+                  <Tabs.Tab label="My Arts" icon={<BsListUl />}>
+                    <ListNfts currentAccount={currentAccount} />
+                  </Tabs.Tab>
+                  <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
+                    <ListAuctions currentAccount={currentAccount} />
+                  </Tabs.Tab>
+                </Tabs>
+              )}
+              {!currentAccount && metamaskInstalled && (
+                <Center>
+                  <Text>Connect your wallet using Metamask</Text>
+                </Center>
+              )}
+              {currentAccount && !validNetwork && (
+                <Center>
+                  <Text>
+                    Unsupported Network: Please change your network to Polygon
+                    or Mumbai
+                  </Text>
+                </Center>
+              )}
+              {!metamaskInstalled && (
+                <Center>
+                  <Text>Install Metamask to use this Web 3.0 app</Text>
+                </Center>
+              )}
             </Container>
           </AppShell>
         </ModalsProvider>
