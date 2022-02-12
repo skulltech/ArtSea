@@ -21,9 +21,9 @@ export const ListAuctions = ({ currentAccount }) => {
           currentAccount,
           contractInfo: config.contracts.marketContract,
         });
-        const maxAuctionId = (await marketContract.auctionIds()).toNumber();
+        const auctionsCount = (await marketContract.auctionIds()).toNumber();
         const allAuctions = await Promise.all(
-          [...Array(maxAuctionId + 1).keys()].map(async (index) => {
+          [...Array(auctionsCount).keys()].map(async (index) => {
             const auctionInfo = await marketContract.auctions(index);
             return { ...auctionInfo, auctionId: index };
           })

@@ -18,6 +18,7 @@ contract ArtSeaMarket {
         bool sold;
     }
 
+    // auctionsIds: Total number of auctions created, also the auctionId of the next auction to be created.
     Counters.Counter public auctionIds;
     Auction[] public auctions;
 
@@ -49,6 +50,7 @@ contract ArtSeaMarket {
         });
         uint newAuctionId = auctionIds.current();
         auctions.push(newAuction);
+        auctionIds.increment();
 
         emit AuctionCreated(newAuctionId, tokenAddress, tokenId, minBidAmount);
     }
