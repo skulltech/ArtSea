@@ -12,6 +12,8 @@ contract ArtSeaMarket {
         address tokenAddress;
         uint tokenId;
         uint minBidAmount;
+        uint createdOn;
+        uint duration;
         uint highestBidAmount;
         address payable highestBidder;
         bool ended;
@@ -34,10 +36,12 @@ contract ArtSeaMarket {
     function createAuction(
         address tokenAddress,
         uint tokenId,
-        uint minBidAmount
+        uint minBidAmount,
+        uint duration
     ) public {
         IERC721 token = IERC721(tokenAddress);
         address tokenOwner = token.ownerOf(tokenId);
+
         require(tokenOwner == msg.sender, "You do not own the NFT");
 
         Auction memory newAuction = Auction({
@@ -45,6 +49,8 @@ contract ArtSeaMarket {
             tokenAddress: tokenAddress,
             tokenId: tokenId,
             minBidAmount: minBidAmount,
+            duration: duration,
+            createdOn: block.timestamp,
             highestBidAmount: 0,
             highestBidder: payable(0),
             ended: false,
@@ -58,15 +64,22 @@ contract ArtSeaMarket {
     }
 
     function placeBid(uint auctionId) public payable {
-        if (msg.value > auctions[auctionId].highestBidAmount) {
-            auctions[auctionId].highestBidder.transfer(
-                auctions[auctionId].highestBidAmount
-            );
-            auctions[auctionId].highestBidAmount = msg.value;
-            auctions[auctionId].highestBidder = payable(msg.sender);
+        Auction memory auction = auctions[auctionId];
 
-            emit BidPlaced(auctionId, payable(msg.sender), msg.value);
-        }
+        require(
+            msg.value > auction.highestBidAmount,
+            "Your bid amount is too low"
+        );
+        require(
+            block.timestamp <= auction.createdOn + auction.duration,
+            "The auction has expired or ended"
+        );
+
+        auction.highestBidder.transfer(auction.highestBidAmount);
+        auctions[auctionId].highestBidAmount = msg.value;
+        auctions[auctionId].highestBidder = payable(msg.sender);
+
+        emit BidPlaced(auctionId, payable(msg.sender), msg.value);
     }
 
     function finalizeAuction(uint auctionId, bool accept) public {
