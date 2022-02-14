@@ -5,7 +5,7 @@ import { useState } from "react";
 import getContract from "../../utils/blockchain";
 import config from "../../utils/config";
 
-export const PlaceBid = ({ currentAccount, auctionToBidOn }) => {
+export const PlaceBid = ({ currentAccount, selectedAuction }) => {
   const form = useForm({
     initialValues: {
       bidAmount: 0,
@@ -21,7 +21,7 @@ export const PlaceBid = ({ currentAccount, auctionToBidOn }) => {
       contractInfo: config.contracts.marketContract,
     });
     const options = { value: parseEther(form.values.bidAmount.toString()) };
-    const txn = await marketContract.placeBid(auctionToBidOn, options);
+    const txn = await marketContract.placeBid(selectedAuction, options);
     console.log("Transaction hash for placing bid:", txn.hash);
     const receipt = await txn.wait();
     console.log("Transaction receipt:", receipt);

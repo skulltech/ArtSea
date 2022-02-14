@@ -4,14 +4,18 @@ import { useState } from "react/cjs/react.development";
 import getContract from "../../utils/blockchain";
 import config from "../../utils/config";
 import { AuctionCard } from "./AuctionCard";
+import { FinalizeAuction } from "./FinalizeAuction";
 import { PlaceBid } from "./PlaceBid";
 
 export const ListAuctions = ({ currentAccount }) => {
   const [allAuctions, setAllAuctions] = useState([]);
   const [auctionsToShow, setAuctionsToShow] = useState([]);
-  const [auctionToBidOn, setAuctionToBidOn] = useState(null);
+  const [selectedAuction, setSelectedAuction] = useState(null);
   const [fetchingAuctions, setFetchingAuctions] = useState(false);
   const [placeBidModalOpened, setPlaceBidModalOpened] = useState(false);
+  const [finalizeAuctionModalOpened, setFinalizeAuctionModalOpened] =
+    useState(false);
+  const [ifSell, setIfSell] = useState(false);
 
   const [creatorFilter, setCreatorFilter] = useState("all");
   const creatorFilterValues = [
@@ -80,6 +84,7 @@ export const ListAuctions = ({ currentAccount }) => {
           .includes(currentAccount),
     };
     const auctions = allAuctions
+      .filter((auction) => !auction.ended)
       .filter(creatorFilterFuncs[creatorFilter])
       .filter(bidderFilterFuncs[bidderFilter]);
     setAuctionsToShow(auctions);
@@ -102,7 +107,20 @@ export const ListAuctions = ({ currentAccount }) => {
         >
           <PlaceBid
             currentAccount={currentAccount}
-            auctionToBidOn={auctionToBidOn}
+            selectedAuction={selectedAuction}
+          />
+        </Modal>
+
+        <Modal
+          opened={finalizeAuctionModalOpened}
+          onClose={() => setFinalizeAuctionModalOpened(false)}
+          title={ifSell ? "Sell to current bidder" : "Cancel auction"}
+          overlayOpacity={0.95}
+        >
+          <FinalizeAuction
+            currentAccount={currentAccount}
+            selectedAuction={selectedAuction}
+            ifSell={ifSell}
           />
         </Modal>
 
@@ -126,8 +144,10 @@ export const ListAuctions = ({ currentAccount }) => {
               auctionDetails={auction}
               key={auction.auctionId}
               currentAccount={currentAccount}
-              setAuctionToBidOn={setAuctionToBidOn}
+              setSelectedAuction={setSelectedAuction}
               setPlaceBidModalOpened={setPlaceBidModalOpened}
+              setFinalizeAuctionModalOpened={setFinalizeAuctionModalOpened}
+              setIfSell={setIfSell}
             />
           ))}
         </Group>

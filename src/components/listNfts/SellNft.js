@@ -17,17 +17,29 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
   const createAuction = async () => {
     setCreatingAuction(true);
 
+    const tokenContract = getContract({
+      currentAccount,
+      contractInfo: config.contracts.nftContract,
+    });
+    let txn = await tokenContract.setApprovalForAll(
+      config.contracts.marketContract.contractAddress,
+      true
+    );
+    console.log("Transaction hash for setApprovalForAll:", txn.hash);
+    let receipt = await txn.wait();
+    console.log("Transaction receipt:", receipt);
+
     const marketContract = getContract({
       currentAccount,
       contractInfo: config.contracts.marketContract,
     });
-    const txn = await marketContract.createAuction(
+    txn = await marketContract.createAuction(
       config.contracts.nftContract.contractAddress,
       tokenToSell,
       parseEther(form.values.minBidAmount.toString())
     );
     console.log("Transaction hash for creating auction:", txn.hash);
-    const receipt = await txn.wait();
+    receipt = await txn.wait();
     console.log("Transaction receipt:", receipt);
     const auctionCreatedEvent = receipt.events.filter((x) => {
       return x.event === "AuctionCreated";
