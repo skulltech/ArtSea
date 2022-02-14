@@ -29,6 +29,8 @@ contract ArtSeaMarket {
         uint minBidAmount
     );
 
+    event BidPlaced(uint auctionId, address payable bidder, uint bidAmount);
+
     function createAuction(
         address tokenAddress,
         uint tokenId,
@@ -62,6 +64,8 @@ contract ArtSeaMarket {
             );
             auctions[auctionId].highestBidAmount = msg.value;
             auctions[auctionId].highestBidder = payable(msg.sender);
+
+            emit BidPlaced(auctionId, payable(msg.sender), msg.value);
         }
     }
 

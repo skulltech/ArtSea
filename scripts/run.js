@@ -75,12 +75,24 @@ const main = async () => {
   console.log(auctions);
 
   // User 2 places a bid on that auction
-  // txn = await marketContract
-  //   .connect(user2)
-  //   .placeBid(0, { value: parseEther("21") });
-  // await txn;
-  // let auction = await marketContract.connect(user1).auctions(0);
-  // console.log(auction);
+  txn = await marketContract
+    .connect(user2)
+    .placeBid(0, { value: parseEther("21") });
+  await txn;
+
+  // Check the auctions
+  auctionIds = await marketContract.connect(user3).auctionIds();
+  auctions = await Promise.all(
+    [...Array(auctionIds.toNumber()).keys()].map(
+      async (index) => await marketContract.connect(user3).auctions(index)
+    )
+  );
+  console.log(auctions);
+
+  let bidPlacedEvents = await marketContract.queryFilter(
+    marketContract.filters.BidPlaced()
+  );
+  console.log("BidPlaced events:", bidPlacedEvents);
 };
 
 const runMain = async () => {

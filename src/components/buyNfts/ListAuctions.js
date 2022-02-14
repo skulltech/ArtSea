@@ -1,4 +1,4 @@
-import { Center, Group, Loader, Modal } from "@mantine/core";
+import { Center, Group, Loader, Modal, NativeSelect } from "@mantine/core";
 import { useEffect } from "react";
 import { useState } from "react/cjs/react.development";
 import getContract from "../../utils/blockchain";
@@ -7,10 +7,25 @@ import { AuctionCard } from "./AuctionCard";
 import { PlaceBid } from "./PlaceBid";
 
 export const ListAuctions = ({ currentAccount }) => {
-  const [auctions, setAuctions] = useState([]);
+  const [allAuctions, setAllAuctions] = useState([]);
+  const [auctionsToShow, setAuctionsToShow] = useState([]);
   const [auctionToBidOn, setAuctionToBidOn] = useState(null);
   const [fetchingAuctions, setFetchingAuctions] = useState(false);
   const [placeBidModalOpened, setPlaceBidModalOpened] = useState(false);
+
+  const [creatorFilter, setCreatorFilter] = useState("all");
+  const creatorFilterValues = [
+    { value: "me", label: "Created by me" },
+    { value: "others", label: "Created by others" },
+    { value: "all", label: "All" },
+  ];
+
+  const [bidderFilter, setBidderFilter] = useState("all");
+  const bidderFilterValues = [
+    { value: "me", label: "Bid on by me" },
+    { value: "others", label: "Bid on by others" },
+    { value: "all", label: "All" },
+  ];
 
   useEffect(() => {
     const fetchAuctions = async () => {
@@ -21,15 +36,21 @@ export const ListAuctions = ({ currentAccount }) => {
           currentAccount,
           contractInfo: config.contracts.marketContract,
         });
+        const bidPlacedEvents = await marketContract.queryFilter(
+          marketContract.filters.BidPlaced()
+        );
         const auctionsCount = (await marketContract.auctionIds()).toNumber();
-        const allAuctions = await Promise.all(
+        const auctions = await Promise.all(
           [...Array(auctionsCount).keys()].map(async (index) => {
             const auctionInfo = await marketContract.auctions(index);
-            return { ...auctionInfo, auctionId: index };
+            const bidders = bidPlacedEvents
+              .filter((value) => value.args.auctionId === index)
+              .map((event) => event.args.bidder);
+            return { ...auctionInfo, auctionId: index, bidders };
           })
         );
-        console.log(allAuctions);
-        setAuctions(allAuctions);
+        console.log(auctions);
+        setAllAuctions(auctions);
       } catch (error) {
         console.log(error);
       }
@@ -39,6 +60,30 @@ export const ListAuctions = ({ currentAccount }) => {
 
     fetchAuctions();
   }, [currentAccount]);
+
+  useEffect(() => {
+    const creatorFilterFuncs = {
+      all: (auction) => true,
+      me: (auction) => auction.ownerAddress.toLowerCase() === currentAccount,
+      others: (auction) =>
+        auction.ownerAddress.toLowerCase() !== currentAccount,
+    };
+    const bidderFilterFuncs = {
+      all: (auction) => true,
+      me: (auction) =>
+        auction.bidders
+          .map((addr) => addr.toLowerCase())
+          .includes(currentAccount),
+      others: (auction) =>
+        !auction.bidders
+          .map((addr) => addr.toLowerCase())
+          .includes(currentAccount),
+    };
+    const auctions = allAuctions
+      .filter(creatorFilterFuncs[creatorFilter])
+      .filter(bidderFilterFuncs[bidderFilter]);
+    setAuctionsToShow(auctions);
+  }, [allAuctions, creatorFilter, bidderFilter, currentAccount]);
 
   if (fetchingAuctions) {
     return (
@@ -62,7 +107,21 @@ export const ListAuctions = ({ currentAccount }) => {
         </Modal>
 
         <Group>
-          {auctions.map((auction) => (
+          <NativeSelect
+            value={creatorFilter}
+            onChange={(event) => setCreatorFilter(event.currentTarget.value)}
+            data={creatorFilterValues}
+            label="Filter by creator"
+            required
+          />
+          <NativeSelect
+            value={bidderFilter}
+            onChange={(event) => setBidderFilter(event.currentTarget.value)}
+            data={bidderFilterValues}
+            label="Filter by bidder"
+            required
+          />
+          {auctionsToShow.map((auction) => (
             <AuctionCard
               auctionDetails={auction}
               key={auction.auctionId}

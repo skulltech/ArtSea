@@ -1,4 +1,5 @@
 import { Button, Card, Text } from "@mantine/core";
+import { formatEther } from "ethers/lib/utils";
 
 export const AuctionCard = ({
   auctionDetails,
@@ -6,16 +7,18 @@ export const AuctionCard = ({
   setPlaceBidModalOpened,
   setAuctionToBidOn,
 }) => {
+  const highestBidder = auctionDetails.highestBidder.toLowerCase();
+  const highestBidAmount = formatEther(auctionDetails.highestBidAmount);
+
   return (
     <Card padding="lg">
       <Card.Section>
         <Text>{auctionDetails.tokenAddress}</Text>
         <Text size="sm">{auctionDetails.tokenId.toNumber()}</Text>
         <Text>
-          Current highest bid is of {auctionDetails.higestBidAmount} $MATIC by{" "}
-          {currentAccount === auctionDetails.highestBidder && "you"}
-          {currentAccount !== auctionDetails.highestBidder &&
-            auctionDetails.highestBidder}
+          Current highest bid is of {highestBidAmount} $MATIC by{" "}
+          {currentAccount === highestBidder && "you"}
+          {currentAccount !== highestBidder && highestBidder}
         </Text>
         <Button
           onClick={() => {
