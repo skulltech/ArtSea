@@ -1,4 +1,4 @@
-import { Button, Group, NativeSelect, NumberInput } from "@mantine/core";
+import { Button, Group, NumberInput } from "@mantine/core";
 import { useForm } from "@mantine/hooks";
 import { parseEther } from "ethers/lib/utils";
 import { useState } from "react";
@@ -10,16 +10,8 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
     initialValues: {
       minBidAmount: null,
       tokenId: null,
-      auctionDuration: 1,
     },
   });
-  const auctionDurationValues = [
-    { value: 1, label: "1 day" },
-    { value: 3, label: "3 days" },
-    { value: 5, label: "5 days" },
-    { value: 7, label: "7 days" },
-    { value: 10, label: "10 days" },
-  ];
   const [creatingAuction, setCreatingAuction] = useState(false);
 
   const createAuction = async () => {
@@ -32,8 +24,7 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
     const txn = await marketContract.createAuction(
       config.contracts.nftContract.contractAddress,
       tokenToSell,
-      parseEther(form.values.minBidAmount.toString()),
-      form.values.auctionDuration * 86400
+      parseEther(form.values.minBidAmount.toString())
     );
     console.log("Transaction hash for creating auction:", txn.hash);
     const receipt = await txn.wait();
@@ -56,15 +47,6 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
           required
           precision={18}
           {...form.getInputProps("minBidAmount")}
-        />
-        <NativeSelect
-          value={form.values.auctionDuration}
-          onChange={(event) =>
-            form.setFieldValue("auctionDuration", event.currentTarget.value)
-          }
-          data={auctionDurationValues}
-          label="Duration of the auction"
-          required
         />
         <Button type="submit" loading={creatingAuction}>
           {!creatingAuction && "Place your auction"}

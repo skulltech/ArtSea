@@ -12,8 +12,6 @@ contract ArtSeaMarket {
         address tokenAddress;
         uint tokenId;
         uint minBidAmount;
-        uint createdOn;
-        uint duration;
         uint highestBidAmount;
         address payable highestBidder;
         bool ended;
@@ -36,8 +34,7 @@ contract ArtSeaMarket {
     function createAuction(
         address tokenAddress,
         uint tokenId,
-        uint minBidAmount,
-        uint duration
+        uint minBidAmount
     ) public {
         IERC721 token = IERC721(tokenAddress);
         address tokenOwner = token.ownerOf(tokenId);
@@ -49,8 +46,6 @@ contract ArtSeaMarket {
             tokenAddress: tokenAddress,
             tokenId: tokenId,
             minBidAmount: minBidAmount,
-            duration: duration,
-            createdOn: block.timestamp,
             highestBidAmount: 0,
             highestBidder: payable(0),
             ended: false,
@@ -66,14 +61,7 @@ contract ArtSeaMarket {
     function placeBid(uint auctionId) public payable {
         Auction memory auction = auctions[auctionId];
 
-        require(
-            msg.value > auction.highestBidAmount,
-            "Your bid amount is too low"
-        );
-        require(
-            block.timestamp <= auction.createdOn + auction.duration,
-            "The auction has expired or ended"
-        );
+        require(msg.value > auction.highestBidAmount, "Your bid is too low");
 
         auction.highestBidder.transfer(auction.highestBidAmount);
         auctions[auctionId].highestBidAmount = msg.value;
@@ -85,6 +73,8 @@ contract ArtSeaMarket {
     function finalizeAuction(uint auctionId, bool accept) public {
         Auction memory auction = auctions[auctionId];
 
+        require(auction.ownerAddress == msg.sender, "You are not the seller");
+
         if (accept) {
             IERC721 token = IERC721(auction.tokenAddress);
             token.safeTransferFrom(
@@ -93,11 +83,11 @@ contract ArtSeaMarket {
                 auction.tokenId
             );
             auction.ownerAddress.transfer(auction.highestBidAmount);
-            auction.sold = true;
+            auctions[auctionId].sold = true;
         } else {
             auction.highestBidder.transfer(auction.highestBidAmount);
-            auction.sold = false;
+            auctions[auctionId].sold = false;
         }
-        auction.ended = true;
+        auctions[auctionId].ended = true;
     }
 }
