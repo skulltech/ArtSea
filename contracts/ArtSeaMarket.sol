@@ -29,8 +29,8 @@ contract ArtSeaMarket {
         uint tokenId,
         uint minBidAmount
     );
-
     event BidPlaced(uint auctionId, address payable bidder, uint bidAmount);
+    event AuctionFinalized(uint auctionId, bool sold);
 
     function liveAuctionIds() public view returns (uint[] memory) {
         uint liveIdsCount = 0;
