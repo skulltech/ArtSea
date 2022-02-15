@@ -21,7 +21,10 @@ export const PlaceBid = ({ currentAccount, selectedAuction }) => {
       contractInfo: config.contracts.marketContract,
     });
     const options = { value: parseEther(form.values.bidAmount.toString()) };
-    const txn = await marketContract.placeBid(selectedAuction, options);
+    const txn = await marketContract.placeBid(
+      selectedAuction.auctionId,
+      options
+    );
     console.log("Transaction hash for placing bid:", txn.hash);
     const receipt = await txn.wait();
     console.log("Transaction receipt:", receipt);

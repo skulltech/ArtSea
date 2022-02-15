@@ -35,7 +35,7 @@ export const AuctionCard = ({
           <Group grow={true}>
             <Button
               onClick={() => {
-                setSelectedAuction(auctionDetails.auctionId);
+                setSelectedAuction(auctionDetails);
                 setFinalizeAuctionModalOpened(true);
                 setIfSell(true);
               }}
@@ -44,7 +44,7 @@ export const AuctionCard = ({
             </Button>
             <Button
               onClick={() => {
-                setSelectedAuction(auctionDetails.auctionId);
+                setSelectedAuction(auctionDetails);
                 setFinalizeAuctionModalOpened(true);
                 setIfSell(false);
               }}
@@ -56,7 +56,7 @@ export const AuctionCard = ({
         {auctionCreator !== currentAccount && (
           <Button
             onClick={() => {
-              setSelectedAuction(auctionDetails.auctionId);
+              setSelectedAuction(auctionDetails);
               setPlaceBidModalOpened(true);
             }}
           >

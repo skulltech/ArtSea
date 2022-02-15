@@ -2,6 +2,7 @@ import { Group, Text, Button } from "@mantine/core";
 import { useState } from "react";
 import getContract from "../../utils/blockchain";
 import config from "../../utils/config";
+import ERC721Abi from "@solidstate/abi/ERC721.json";
 
 export const FinalizeAuction = ({
   currentAccount,
@@ -12,14 +13,34 @@ export const FinalizeAuction = ({
 
   const finalizeAuction = async () => {
     setFinalizingAuction(true);
-    console.log(selectedAuction, ifSell);
+    let txn, receipt;
+
+    if (ifSell) {
+      const nftContract = getContract({
+        currentAccount,
+        contractInfo: {
+          contractAbi: ERC721Abi,
+          contractAddress: selectedAuction.tokenAddress,
+        },
+      });
+      txn = await nftContract.approve(
+        config.contracts.marketContract.contractAddress,
+        selectedAuction.tokenId
+      );
+      console.log("Transaction hash for approve:", txn.hash);
+      receipt = await txn.wait();
+      console.log("Transaction receipt:", receipt);
+    }
 
     const marketContract = getContract({
       currentAccount,
       contractInfo: config.contracts.marketContract,
     });
-    const txn = await marketContract.finalizeAuction(selectedAuction, ifSell);
-    const receipt = await txn.wait();
+    txn = await marketContract.finalizeAuction(
+      selectedAuction.auctionId,
+      ifSell
+    );
+    receipt = await txn.wait();
     console.log("Receipt: ", receipt);
 
     setFinalizingAuction(false);
