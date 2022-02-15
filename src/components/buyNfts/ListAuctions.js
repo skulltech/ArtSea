@@ -9,7 +9,7 @@ import { PlaceBid } from "./PlaceBid";
 import ERC721MetadataAbi from "@solidstate/abi/ERC721Metadata.json";
 import { fetchJson } from "ethers/lib/utils";
 
-export const ListAuctions = ({ currentAccount }) => {
+export const ListAuctions = ({ currentAccount, currentNetwork }) => {
   const [allAuctions, setAllAuctions] = useState([]);
   const [auctionsToShow, setAuctionsToShow] = useState([]);
   const [selectedAuction, setSelectedAuction] = useState(null);
@@ -158,12 +158,13 @@ export const ListAuctions = ({ currentAccount }) => {
               required
             />
           </Group>
-          <Group direction="column" grow={true}>
+          <Group>
             {auctionsToShow.map((auction) => (
               <AuctionCard
                 auctionDetails={auction}
                 key={auction.auctionId}
                 currentAccount={currentAccount}
+                currentNetwork={currentNetwork}
                 setSelectedAuction={setSelectedAuction}
                 setPlaceBidModalOpened={setPlaceBidModalOpened}
                 setFinalizeAuctionModalOpened={setFinalizeAuctionModalOpened}

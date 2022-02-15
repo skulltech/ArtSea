@@ -35,10 +35,12 @@ export const NftCard = ({
         spacing="sm"
         style={{ marginTop: 5 }}
       >
-        <Text weight="bold">
-          {nftDetails.tokenMetadata.name + " [ " + nftDetails.tokenId + " ]"}
-        </Text>
+        <Text weight="bold">{nftDetails.tokenMetadata.name}</Text>
         <Text>{nftDetails.tokenMetadata.description}</Text>
+        <Text size="sm">
+          {config.contracts.nftContract.contractAddress} ::{" "}
+          {nftDetails.tokenId.toNumber()}
+        </Text>
         <List>
           <List.Item>
             <Anchor href={nftDetails.tokenURI} target="_blank">

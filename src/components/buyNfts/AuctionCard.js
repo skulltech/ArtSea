@@ -1,9 +1,13 @@
-import { Button, Card, Group, Image, Text } from "@mantine/core";
+import { Anchor, Button, Card, Group, Image, List, Text } from "@mantine/core";
 import { formatEther } from "ethers/lib/utils";
+import { RiExternalLinkLine } from "react-icons/ri";
+import urljoin from "url-join";
+import config from "../../utils/config";
 
 export const AuctionCard = ({
   auctionDetails,
   currentAccount,
+  currentNetwork,
   setPlaceBidModalOpened,
   setSelectedAuction,
   setFinalizeAuctionModalOpened,
@@ -13,14 +17,42 @@ export const AuctionCard = ({
   const highestBidAmount = formatEther(auctionDetails.highestBidAmount);
   const auctionCreator = auctionDetails.ownerAddress.toLowerCase();
   const zeroAddress = "0x0000000000000000000000000000000000000000";
+  const openSeaLink = urljoin(
+    config.networks[currentNetwork].openSeaUrl,
+    config.contracts.nftContract.contractAddress,
+    auctionDetails.tokenId.toString()
+  );
 
   return (
     <Card shadow="sm">
       <Card.Section>
-        {/* <Image src={nftDetails.tokenMetadata.image} height={160}></Image> */}
+        <Image src={auctionDetails.nftMetadata.image} height={160}></Image>
+      </Card.Section>
+      <Group
+        direction="column"
+        grow={true}
+        spacing="sm"
+        style={{ marginTop: 5 }}
+      >
+        <Text weight="bold">{auctionDetails.nftMetadata.name}</Text>
+        <Text>{auctionDetails.nftMetadata.description}</Text>
+        <Text size="sm">
+          {auctionDetails.tokenAddress} :: {auctionDetails.tokenId.toNumber()}
+        </Text>
 
-        <Text>{auctionDetails.tokenAddress}</Text>
-        <Text size="sm">{auctionDetails.tokenId.toNumber()}</Text>
+        <List>
+          <List.Item>
+            <Anchor href={auctionDetails.nftMetadataURI} target="_blank">
+              Token Metadata <RiExternalLinkLine />
+            </Anchor>
+          </List.Item>
+          <List.Item>
+            <Anchor href={openSeaLink} target="_blank">
+              View On OpenSea <RiExternalLinkLine />
+            </Anchor>
+          </List.Item>
+        </List>
+
         {highestBidder === zeroAddress && (
           <Text>No one has bid on this auction yet</Text>
         )}
@@ -32,7 +64,7 @@ export const AuctionCard = ({
           </Text>
         )}
         {auctionCreator === currentAccount && (
-          <Group grow={true}>
+          <>
             <Button
               onClick={() => {
                 setSelectedAuction(auctionDetails);
@@ -51,7 +83,7 @@ export const AuctionCard = ({
             >
               Cancel auction
             </Button>
-          </Group>
+          </>
         )}
         {auctionCreator !== currentAccount && (
           <Button
@@ -63,7 +95,7 @@ export const AuctionCard = ({
             Place bid
           </Button>
         )}
-      </Card.Section>
+      </Group>
     </Card>
   );
 };

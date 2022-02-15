@@ -107,7 +107,10 @@ export default function App() {
                     />
                   </Tabs.Tab>
                   <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
-                    <ListAuctions currentAccount={currentAccount} />
+                    <ListAuctions
+                      currentAccount={currentAccount}
+                      currentNetwork={currentNetwork}
+                    />
                   </Tabs.Tab>
                 </Tabs>
               )}
