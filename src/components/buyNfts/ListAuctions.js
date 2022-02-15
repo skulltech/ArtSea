@@ -9,8 +9,12 @@ import { PlaceBid } from "./PlaceBid";
 import ERC721MetadataAbi from "@solidstate/abi/ERC721Metadata.json";
 import { fetchJson } from "ethers/lib/utils";
 
-export const ListAuctions = ({ currentAccount, currentNetwork }) => {
-  const [allAuctions, setAllAuctions] = useState([]);
+export const ListAuctions = ({
+  currentAccount,
+  currentNetwork,
+  allAuctions,
+  setAllAuctions,
+}) => {
   const [auctionsToShow, setAuctionsToShow] = useState([]);
   const [selectedAuction, setSelectedAuction] = useState(null);
   const [fetchingAuctions, setFetchingAuctions] = useState(false);

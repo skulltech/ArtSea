@@ -27,6 +27,8 @@ export default function App() {
   const [currentNetwork, setCurrentNetwork] = useState(null);
   const [metamaskInstalled, setMetamaskInstalled] = useState(false);
   const [activeTab, setActiveTab] = useState(1);
+  const [nfts, setNfts] = useState([]);
+  const [allAuctions, setAllAuctions] = useState([]);
 
   const validNetwork = Object.keys(config.networks).includes(currentNetwork);
 
@@ -106,12 +108,16 @@ export default function App() {
                         <ListNfts
                           currentAccount={currentAccount}
                           currentNetwork={currentNetwork}
+                          nfts={nfts}
+                          setNfts={setNfts}
                         />
                       </Tabs.Tab>
                       <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
                         <ListAuctions
                           currentAccount={currentAccount}
                           currentNetwork={currentNetwork}
+                          allAuctions={allAuctions}
+                          setAllAuctions={setAllAuctions}
                         />
                       </Tabs.Tab>
                     </Tabs>

@@ -6,8 +6,7 @@ import { SellNft } from "./SellNft";
 import config from "../../utils/config";
 import { fetchJson } from "ethers/lib/utils";
 
-export const ListNfts = ({ currentAccount, currentNetwork }) => {
-  const [nfts, setNfts] = useState([]);
+export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
   const [sellNftModalOpened, setSellNftModalOpened] = useState(false);
   const [tokenToSell, setTokenToSell] = useState(null);
   const [fetchingNfts, setFetchingNfts] = useState(false);
