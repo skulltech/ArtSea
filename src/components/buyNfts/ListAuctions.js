@@ -103,7 +103,6 @@ export const ListAuctions = ({ currentAccount }) => {
           .includes(currentAccount),
     };
     const auctions = allAuctions
-      .filter((auction) => !auction.ended)
       .filter(creatorFilterFuncs[creatorFilter])
       .filter(bidderFilterFuncs[bidderFilter]);
     setAuctionsToShow(auctions);

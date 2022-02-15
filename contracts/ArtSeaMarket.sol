@@ -14,7 +14,6 @@ contract ArtSeaMarket {
         uint minBidAmount;
         uint highestBidAmount;
         address payable highestBidder;
-        bool ended;
         bool sold;
     }
 
@@ -69,7 +68,6 @@ contract ArtSeaMarket {
             minBidAmount: minBidAmount,
             highestBidAmount: 0,
             highestBidder: payable(0),
-            ended: false,
             sold: false
         });
         uint newAuctionId = auctionIds.current();
@@ -110,7 +108,6 @@ contract ArtSeaMarket {
             auction.highestBidder.transfer(auction.highestBidAmount);
             auctions[auctionId].sold = false;
         }
-        auctions[auctionId].ended = true;
         auctionIsLive[auctionId] = false;
     }
 }
