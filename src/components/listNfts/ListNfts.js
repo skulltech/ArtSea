@@ -2,7 +2,6 @@ import { Center, Group, Loader, Modal } from "@mantine/core";
 import { useEffect, useState } from "react";
 import getContract from "../../utils/blockchain";
 import { NftCard } from "./NftCard";
-import { fetchWithTimeout } from "../../utils/fetch";
 import { SellNft } from "./SellNft";
 import config from "../../utils/config";
 import { fetchJson } from "ethers/lib/utils";

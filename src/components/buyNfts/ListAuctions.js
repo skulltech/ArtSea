@@ -46,12 +46,6 @@ export const ListAuctions = ({ currentAccount }) => {
           marketContract.filters.BidPlaced()
         );
         const auctionIds = await marketContract.liveAuctionIds();
-        console.log("Live auction Ids", auctionIds);
-        console.log("Current counter", await marketContract.auctionIds());
-        for (let i = 0; i < 10; i++) {
-          const auctionIsLive = await marketContract.auctionIsLive(i);
-          console.log(auctionIsLive);
-        }
         const auctions = await Promise.all(
           auctionIds.map(async (auctionId) => {
             const auctionInfo = await marketContract.auctions(auctionId);
