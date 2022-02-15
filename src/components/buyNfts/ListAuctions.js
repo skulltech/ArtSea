@@ -6,6 +6,8 @@ import config from "../../utils/config";
 import { AuctionCard } from "./AuctionCard";
 import { FinalizeAuction } from "./FinalizeAuction";
 import { PlaceBid } from "./PlaceBid";
+import ERC721MetadataAbi from "@solidstate/abi/ERC721Metadata.json";
+import { fetchJson } from "ethers/lib/utils";
 
 export const ListAuctions = ({ currentAccount }) => {
   const [allAuctions, setAllAuctions] = useState([]);
@@ -50,7 +52,24 @@ export const ListAuctions = ({ currentAccount }) => {
             const bidders = bidPlacedEvents
               .filter((value) => value.args.auctionId === auctionId)
               .map((event) => event.args.bidder);
-            return { ...auctionInfo, auctionId, bidders };
+            const nftContract = getContract({
+              currentAccount,
+              contractInfo: {
+                contractAbi: ERC721MetadataAbi,
+                contractAddress: auctionInfo.tokenAddress,
+              },
+            });
+            const nftMetadataURI = await nftContract.tokenURI(
+              auctionInfo.tokenId
+            );
+            const nftMetadata = await fetchJson(nftMetadataURI);
+            return {
+              ...auctionInfo,
+              auctionId,
+              bidders,
+              nftMetadataURI,
+              nftMetadata,
+            };
           })
         );
         console.log(auctions);

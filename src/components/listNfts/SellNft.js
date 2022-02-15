@@ -16,17 +16,18 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
 
   const createAuction = async () => {
     setCreatingAuction(true);
+    let txn, receipt;
 
     const tokenContract = getContract({
       currentAccount,
       contractInfo: config.contracts.nftContract,
     });
-    let txn = await tokenContract.setApprovalForAll(
+    txn = await tokenContract.approve(
       config.contracts.marketContract.contractAddress,
-      true
+      tokenToSell
     );
-    console.log("Transaction hash for setApprovalForAll:", txn.hash);
-    let receipt = await txn.wait();
+    console.log("Transaction hash for approve:", txn.hash);
+    receipt = await txn.wait();
     console.log("Transaction receipt:", receipt);
 
     const marketContract = getContract({

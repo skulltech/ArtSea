@@ -2347,6 +2347,11 @@
   dependencies:
     antlr4ts "^0.5.0-alpha.4"
 
+"@solidstate/abi@^0.0.29":
+  version "0.0.29"
+  resolved "https://registry.yarnpkg.com/@solidstate/abi/-/abi-0.0.29.tgz#f037cfd90c667bf0f0c1c75ca371ade7166958cc"
+  integrity sha512-mB88euImT+MOAeh2LXddkP3sHODOhkmSgW5qdDwMza/8OAAWttTcA5AuVTI8gu4rcPTlYifhsKGb6csb6F+QuQ==
+
 "@surma/rollup-plugin-off-main-thread@^2.2.3":
   version "2.2.3"
   resolved "https://registry.yarnpkg.com/@surma/rollup-plugin-off-main-thread/-/rollup-plugin-off-main-thread-2.2.3.tgz#ee34985952ca21558ab0d952f00298ad2190c053"
