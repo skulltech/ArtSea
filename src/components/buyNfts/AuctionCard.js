@@ -1,4 +1,4 @@
-import { Button, Card, Group, Text } from "@mantine/core";
+import { Button, Card, Group, Image, Text } from "@mantine/core";
 import { formatEther } from "ethers/lib/utils";
 
 export const AuctionCard = ({
@@ -15,8 +15,10 @@ export const AuctionCard = ({
   const zeroAddress = "0x0000000000000000000000000000000000000000";
 
   return (
-    <Card padding="lg">
+    <Card shadow="sm">
       <Card.Section>
+        {/* <Image src={nftDetails.tokenMetadata.image} height={160}></Image> */}
+
         <Text>{auctionDetails.tokenAddress}</Text>
         <Text size="sm">{auctionDetails.tokenId.toNumber()}</Text>
         {highestBidder === zeroAddress && (

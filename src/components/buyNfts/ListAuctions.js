@@ -43,14 +43,14 @@ export const ListAuctions = ({ currentAccount }) => {
         const bidPlacedEvents = await marketContract.queryFilter(
           marketContract.filters.BidPlaced()
         );
-        const auctionsCount = (await marketContract.auctionIds()).toNumber();
+        const auctionIds = await marketContract.liveAuctionIds();
         const auctions = await Promise.all(
-          [...Array(auctionsCount).keys()].map(async (index) => {
-            const auctionInfo = await marketContract.auctions(index);
+          auctionIds.map(async (auctionId) => {
+            const auctionInfo = await marketContract.auctions(auctionId);
             const bidders = bidPlacedEvents
-              .filter((value) => value.args.auctionId === index)
+              .filter((value) => value.args.auctionId === auctionId)
               .map((event) => event.args.bidder);
-            return { ...auctionInfo, auctionId: index, bidders };
+            return { ...auctionInfo, auctionId, bidders };
           })
         );
         console.log(auctions);

@@ -93,6 +93,9 @@ const main = async () => {
     marketContract.filters.BidPlaced()
   );
   console.log("BidPlaced events:", bidPlacedEvents);
+
+  const liveAuctionIds = await marketContract.liveAuctionIds();
+  console.log("Live Auction Ids", liveAuctionIds);
 };
 
 const runMain = async () => {

@@ -21,6 +21,7 @@ contract ArtSeaMarket {
     // auctionsIds: Total number of auctions created, also the auctionId of the next auction to be created.
     Counters.Counter public auctionIds;
     Auction[] public auctions;
+    mapping(uint => bool) public auctionIsLive;
 
     event AuctionCreated(
         uint auctionId,
@@ -30,6 +31,26 @@ contract ArtSeaMarket {
     );
 
     event BidPlaced(uint auctionId, address payable bidder, uint bidAmount);
+
+    function liveAuctionIds() public view returns (uint[] memory) {
+        uint liveIdsCount = 0;
+        uint[] memory liveIdsTemp = new uint[](auctionIds.current());
+        for (uint i = 0; i < auctionIds.current(); i++) {
+            if (auctionIsLive[i]) {
+                liveIdsTemp[liveIdsCount] = i;
+                liveIdsCount++;
+            }
+        }
+
+        uint[] memory liveIds = new uint[](liveIdsCount);
+        for (uint i = 0; i < liveIdsCount; i++) {
+            if (auctionIsLive[i]) {
+                liveIds[i] = liveIdsTemp[i];
+            }
+        }
+
+        return liveIds;
+    }
 
     function createAuction(
         address tokenAddress,
@@ -52,6 +73,7 @@ contract ArtSeaMarket {
             sold: false
         });
         uint newAuctionId = auctionIds.current();
+        auctionIsLive[newAuctionId] = true;
         auctions.push(newAuction);
         auctionIds.increment();
 
@@ -89,5 +111,6 @@ contract ArtSeaMarket {
             auctions[auctionId].sold = false;
         }
         auctions[auctionId].ended = true;
+        auctionIsLive[auctionId] = false;
     }
 }
