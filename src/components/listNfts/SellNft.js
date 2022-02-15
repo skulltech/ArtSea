@@ -49,8 +49,7 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
           {...form.getInputProps("minBidAmount")}
         />
         <Button type="submit" loading={creatingAuction}>
-          {!creatingAuction && "Place your auction"}
-          {creatingAuction && "Creating Auction"}
+          {creatingAuction ? "Creating Auction" : "Place your auction"}
         </Button>
       </Group>
     </form>

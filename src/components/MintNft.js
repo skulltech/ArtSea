@@ -114,8 +114,7 @@ export const MintNft = ({ currentAccount }) => {
           )}
         </Dropzone>
         <Button type="submit" loading={minting}>
-          {!minting && "Mint"}
-          {minting && "Minting"}
+          {minting ? "Minting" : "Mint"}
         </Button>
       </Group>
     </form>

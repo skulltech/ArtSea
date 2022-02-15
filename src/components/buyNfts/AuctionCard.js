@@ -53,17 +53,15 @@ export const AuctionCard = ({
           </List.Item>
         </List>
 
-        {highestBidder === zeroAddress && (
+        {highestBidder === zeroAddress ? (
           <Text>No one has bid on this auction yet</Text>
-        )}
-        {highestBidder !== zeroAddress && (
+        ) : (
           <Text>
             Current highest bid is of {highestBidAmount} $MATIC by{" "}
-            {currentAccount === highestBidder && "you"}
-            {currentAccount !== highestBidder && highestBidder}
+            {currentAccount === highestBidder ? "you" : highestBidder}:
           </Text>
         )}
-        {auctionCreator === currentAccount && (
+        {auctionCreator === currentAccount ? (
           <>
             <Button
               onClick={() => {
@@ -84,8 +82,7 @@ export const AuctionCard = ({
               Cancel auction
             </Button>
           </>
-        )}
-        {auctionCreator !== currentAccount && (
+        ) : (
           <Button
             onClick={() => {
               setSelectedAuction(auctionDetails);

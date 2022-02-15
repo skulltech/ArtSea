@@ -95,39 +95,40 @@ export default function App() {
             }
           >
             <Container size="sm">
-              {currentAccount && validNetwork && (
-                <Tabs activeTab={activeTab} onTabChange={setActiveTab}>
-                  <Tabs.Tab label="Mint" icon={<HiOutlineCloudUpload />}>
-                    <MintNft currentAccount={currentAccount} />
-                  </Tabs.Tab>
-                  <Tabs.Tab label="My Arts" icon={<BsListUl />}>
-                    <ListNfts
-                      currentAccount={currentAccount}
-                      currentNetwork={currentNetwork}
-                    />
-                  </Tabs.Tab>
-                  <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
-                    <ListAuctions
-                      currentAccount={currentAccount}
-                      currentNetwork={currentNetwork}
-                    />
-                  </Tabs.Tab>
-                </Tabs>
-              )}
-              {!currentAccount && metamaskInstalled && (
-                <Center>
-                  <Text>Connect your wallet using Metamask</Text>
-                </Center>
-              )}
-              {currentAccount && !validNetwork && (
-                <Center>
-                  <Text>
-                    Unsupported Network: Please change your network to Polygon
-                    or Mumbai
-                  </Text>
-                </Center>
-              )}
-              {!metamaskInstalled && (
+              {metamaskInstalled ? (
+                currentAccount ? (
+                  validNetwork ? (
+                    <Tabs activeTab={activeTab} onTabChange={setActiveTab}>
+                      <Tabs.Tab label="Mint" icon={<HiOutlineCloudUpload />}>
+                        <MintNft currentAccount={currentAccount} />
+                      </Tabs.Tab>
+                      <Tabs.Tab label="My Arts" icon={<BsListUl />}>
+                        <ListNfts
+                          currentAccount={currentAccount}
+                          currentNetwork={currentNetwork}
+                        />
+                      </Tabs.Tab>
+                      <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
+                        <ListAuctions
+                          currentAccount={currentAccount}
+                          currentNetwork={currentNetwork}
+                        />
+                      </Tabs.Tab>
+                    </Tabs>
+                  ) : (
+                    <Center>
+                      <Text>
+                        Unsupported Network: Please change your network to
+                        Polygon or Mumbai
+                      </Text>
+                    </Center>
+                  )
+                ) : (
+                  <Center>
+                    <Text>Connect your wallet using Metamask</Text>
+                  </Center>
+                )
+              ) : (
                 <Center>
                   <Text>Install Metamask to use this Web 3.0 app</Text>
                 </Center>

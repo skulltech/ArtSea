@@ -43,8 +43,7 @@ export const PlaceBid = ({ currentAccount, selectedAuction }) => {
           {...form.getInputProps("bidAmount")}
         />
         <Button type="submit" loading={placingBid}>
-          {!placingBid && "Place your bid"}
-          {placingBid && "Placing bid"}
+          {placingBid ? "Placing bid" : "Place your bid"}
         </Button>
       </Group>
     </form>
