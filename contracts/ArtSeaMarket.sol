@@ -21,6 +21,7 @@ contract ArtSeaMarket {
     Counters.Counter public auctionIds;
     Auction[] public auctions;
     mapping(uint => bool) public auctionIsLive;
+    mapping(address => mapping(uint => bool)) public tokenIsForSale;
 
     event AuctionCreated(
         uint auctionId,
@@ -43,9 +44,7 @@ contract ArtSeaMarket {
 
         uint[] memory liveIds = new uint[](liveIdsCount);
         for (uint i = 0; i < liveIdsCount; i++) {
-            if (auctionIsLive[i]) {
-                liveIds[i] = liveIdsTemp[i];
-            }
+            liveIds[i] = liveIdsTemp[i];
         }
 
         return liveIds;
@@ -60,6 +59,10 @@ contract ArtSeaMarket {
         address tokenOwner = token.ownerOf(tokenId);
 
         require(tokenOwner == msg.sender, "You do not own the NFT");
+        require(
+            !tokenIsForSale[tokenAddress][tokenId],
+            "Token is already for sale"
+        );
 
         Auction memory newAuction = Auction({
             ownerAddress: payable(msg.sender),
@@ -72,6 +75,7 @@ contract ArtSeaMarket {
         });
         uint newAuctionId = auctionIds.current();
         auctionIsLive[newAuctionId] = true;
+        tokenIsForSale[tokenAddress][tokenId] = true;
         auctions.push(newAuction);
         auctionIds.increment();
 
@@ -109,5 +113,6 @@ contract ArtSeaMarket {
             auctions[auctionId].sold = false;
         }
         auctionIsLive[auctionId] = false;
+        tokenIsForSale[auction.tokenAddress][auction.tokenId] = false;
     }
 }

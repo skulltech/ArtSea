@@ -5,6 +5,7 @@ import { NftCard } from "./NftCard";
 import { fetchWithTimeout } from "../../utils/fetch";
 import { SellNft } from "./SellNft";
 import config from "../../utils/config";
+import { fetchJson } from "ethers/lib/utils";
 
 export const ListNfts = ({ currentAccount, currentNetwork }) => {
   const [nfts, setNfts] = useState([]);
@@ -20,6 +21,10 @@ export const ListNfts = ({ currentAccount, currentNetwork }) => {
         currentAccount,
         contractInfo: config.contracts.nftContract,
       });
+      const marketContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.marketContract,
+      });
       const balance = (await nftContract.balanceOf(currentAccount)).toNumber();
       const nftsOwned = await Promise.all(
         [...Array(balance).keys()].map(async (index) => {
@@ -28,13 +33,12 @@ export const ListNfts = ({ currentAccount, currentNetwork }) => {
             index
           );
           const tokenURI = await nftContract.tokenURI(tokenId);
-          let tokenMetadata;
-          try {
-            tokenMetadata = await (await fetchWithTimeout(tokenURI)).json();
-          } catch (err) {
-            console.log(err);
-          }
-          return { tokenId, tokenURI, tokenMetadata };
+          const tokenMetadata = await fetchJson(tokenURI);
+          const forSale = await marketContract.tokenIsForSale(
+            config.contracts.nftContract.contractAddress,
+            tokenId
+          );
+          return { tokenId, tokenURI, tokenMetadata, tokenIsForSale: forSale };
         })
       );
       console.log(nftsOwned);

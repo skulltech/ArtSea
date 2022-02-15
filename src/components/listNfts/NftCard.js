@@ -1,4 +1,13 @@
-import { Anchor, Button, Card, Group, Image, List, Text } from "@mantine/core";
+import {
+  Anchor,
+  Badge,
+  Button,
+  Card,
+  Group,
+  Image,
+  List,
+  Text,
+} from "@mantine/core";
 import { RiExternalLinkLine } from "react-icons/ri";
 import urljoin from "url-join";
 import config from "../../utils/config";
@@ -42,14 +51,18 @@ export const NftCard = ({
             </Anchor>
           </List.Item>
         </List>
-        <Button
-          onClick={() => {
-            setSellNftModalOpened(true);
-            setTokenToSell(nftDetails.tokenId.toNumber());
-          }}
-        >
-          Sell this NFT
-        </Button>
+        {nftDetails.tokenIsForSale ? (
+          <Badge>For Sale</Badge>
+        ) : (
+          <Button
+            onClick={() => {
+              setSellNftModalOpened(true);
+              setTokenToSell(nftDetails.tokenId.toNumber());
+            }}
+          >
+            Sell this NFT
+          </Button>
+        )}
       </Group>
     </Card>
   );
