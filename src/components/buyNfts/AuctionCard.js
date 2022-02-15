@@ -30,7 +30,7 @@ export const AuctionCard = ({
           </Text>
         )}
         {auctionCreator === currentAccount && (
-          <Group>
+          <Group grow={true}>
             <Button
               onClick={() => {
                 setSelectedAuction(auctionDetails.auctionId);

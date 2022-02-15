@@ -13,6 +13,14 @@ const config = {
       contractAbi: marketJson.abi,
     },
   },
+  networks: {
+    137: {
+      openSeaUrl: configJson.polygonOpenSeaUrl,
+    },
+    80001: {
+      openSeaUrl: configJson.mumbaiOpenSeaUrl,
+    },
+  },
 };
 
 export default config;

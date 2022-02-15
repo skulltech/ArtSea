@@ -4,7 +4,7 @@ import { useState } from "react";
 export const ConnectWallet = ({
   currentAccount,
   setCurrentAccount,
-  setValidNetwork,
+  setCurrentNetwork,
 }) => {
   const [connecting, setConnecting] = useState(false);
 
@@ -25,7 +25,7 @@ export const ConnectWallet = ({
     setConnecting(true);
     const { account, network } = await connectAccount();
     setCurrentAccount(account);
-    setValidNetwork([137, 80001].includes(network));
+    setCurrentNetwork(network);
     setConnecting(false);
   };
 

@@ -123,33 +123,36 @@ export const ListAuctions = ({ currentAccount }) => {
             ifSell={ifSell}
           />
         </Modal>
-
-        <Group>
-          <NativeSelect
-            value={creatorFilter}
-            onChange={(event) => setCreatorFilter(event.currentTarget.value)}
-            data={creatorFilterValues}
-            label="Filter by creator"
-            required
-          />
-          <NativeSelect
-            value={bidderFilter}
-            onChange={(event) => setBidderFilter(event.currentTarget.value)}
-            data={bidderFilterValues}
-            label="Filter by bidder"
-            required
-          />
-          {auctionsToShow.map((auction) => (
-            <AuctionCard
-              auctionDetails={auction}
-              key={auction.auctionId}
-              currentAccount={currentAccount}
-              setSelectedAuction={setSelectedAuction}
-              setPlaceBidModalOpened={setPlaceBidModalOpened}
-              setFinalizeAuctionModalOpened={setFinalizeAuctionModalOpened}
-              setIfSell={setIfSell}
+        <Group direction="column" grow={true}>
+          <Group position="right">
+            <NativeSelect
+              value={creatorFilter}
+              onChange={(event) => setCreatorFilter(event.currentTarget.value)}
+              data={creatorFilterValues}
+              label="Filter by creator"
+              required
             />
-          ))}
+            <NativeSelect
+              value={bidderFilter}
+              onChange={(event) => setBidderFilter(event.currentTarget.value)}
+              data={bidderFilterValues}
+              label="Filter by bidder"
+              required
+            />
+          </Group>
+          <Group direction="column" grow={true}>
+            {auctionsToShow.map((auction) => (
+              <AuctionCard
+                auctionDetails={auction}
+                key={auction.auctionId}
+                currentAccount={currentAccount}
+                setSelectedAuction={setSelectedAuction}
+                setPlaceBidModalOpened={setPlaceBidModalOpened}
+                setFinalizeAuctionModalOpened={setFinalizeAuctionModalOpened}
+                setIfSell={setIfSell}
+              />
+            ))}
+          </Group>
         </Group>
       </>
     );

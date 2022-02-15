@@ -6,7 +6,7 @@ import { fetchWithTimeout } from "../../utils/fetch";
 import { SellNft } from "./SellNft";
 import config from "../../utils/config";
 
-export const ListNfts = ({ currentAccount }) => {
+export const ListNfts = ({ currentAccount, currentNetwork }) => {
   const [nfts, setNfts] = useState([]);
   const [sellNftModalOpened, setSellNftModalOpened] = useState(false);
   const [tokenToSell, setTokenToSell] = useState(null);
@@ -70,6 +70,7 @@ export const ListNfts = ({ currentAccount }) => {
               key={nft.tokenId}
               setSellNftModalOpened={setSellNftModalOpened}
               setTokenToSell={setTokenToSell}
+              currentNetwork={currentNetwork}
             />
           ))}
         </Group>

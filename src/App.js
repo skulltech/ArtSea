@@ -20,12 +20,15 @@ import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { ListNfts } from "./components/listNfts/ListNfts";
 import { ListAuctions } from "./components/buyNfts/ListAuctions";
+import config from "./utils/config";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
-  const [validNetwork, setValidNetwork] = useState(false);
+  const [currentNetwork, setCurrentNetwork] = useState(null);
   const [metamaskInstalled, setMetamaskInstalled] = useState(false);
   const [activeTab, setActiveTab] = useState(1);
+
+  const validNetwork = Object.keys(config.networks).includes(currentNetwork);
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -42,7 +45,7 @@ export default function App() {
     }
     console.log("Authorized account found:", accounts[0]);
     setCurrentAccount(accounts[0]);
-    setValidNetwork([137, 80001].includes(parseInt(ethereum.networkVersion)));
+    setCurrentNetwork(ethereum.networkVersion);
     return true;
   };
 
@@ -84,7 +87,7 @@ export default function App() {
                     <ConnectWallet
                       currentAccount={currentAccount}
                       setCurrentAccount={setCurrentAccount}
-                      setValidNetwork={setValidNetwork}
+                      setCurrentNetwork={setCurrentNetwork}
                     />
                   )}
                 </Group>
@@ -98,7 +101,10 @@ export default function App() {
                     <MintNft currentAccount={currentAccount} />
                   </Tabs.Tab>
                   <Tabs.Tab label="My Arts" icon={<BsListUl />}>
-                    <ListNfts currentAccount={currentAccount} />
+                    <ListNfts
+                      currentAccount={currentAccount}
+                      currentNetwork={currentNetwork}
+                    />
                   </Tabs.Tab>
                   <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
                     <ListAuctions currentAccount={currentAccount} />
