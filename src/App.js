@@ -84,7 +84,7 @@ export default function App() {
       }}
     >
       <NotificationsProvider>
-        <ModalsProvider>
+        <ModalsProvider labels={{ confirm: "Confirm", cancel: "Cancel" }}>
           <AppShell
             padding="md"
             header={
