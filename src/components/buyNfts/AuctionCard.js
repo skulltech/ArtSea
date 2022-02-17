@@ -3,6 +3,7 @@ import { formatEther } from "ethers/lib/utils";
 import { RiExternalLinkLine } from "react-icons/ri";
 import urljoin from "url-join";
 import config from "../../utils/config";
+import { minifyAddress } from "../../utils/string";
 
 export const AuctionCard = ({
   auctionDetails,
@@ -34,12 +35,13 @@ export const AuctionCard = ({
         spacing="sm"
         style={{ marginTop: 5 }}
       >
-        <Text weight="bold">{auctionDetails.nftMetadata.name}</Text>
+        <Group position="apart">
+          <Text size="lg" weight="bold">
+            {auctionDetails.nftMetadata.name}
+          </Text>
+          <Text>{auctionDetails.tokenId.toNumber()}</Text>
+        </Group>
         <Text>{auctionDetails.nftMetadata.description}</Text>
-        <Text size="sm">
-          {auctionDetails.tokenAddress} :: {auctionDetails.tokenId.toNumber()}
-        </Text>
-
         <List>
           <List.Item>
             <Anchor href={auctionDetails.nftMetadataURI} target="_blank">
@@ -52,7 +54,6 @@ export const AuctionCard = ({
             </Anchor>
           </List.Item>
         </List>
-
         {highestBidder === zeroAddress ? (
           <Text>No one has bid on this auction yet</Text>
         ) : (

@@ -1,16 +1,9 @@
-import {
-  Anchor,
-  Badge,
-  Button,
-  Card,
-  Group,
-  Image,
-  List,
-  Text,
-} from "@mantine/core";
+import { Anchor, Button, Card, Group, Image, List, Text } from "@mantine/core";
+import { useElementSize } from "@mantine/hooks";
 import { RiExternalLinkLine } from "react-icons/ri";
 import urljoin from "url-join";
 import config from "../../utils/config";
+import { minifyAddress } from "../../utils/string";
 
 export const NftCard = ({
   nftDetails,
@@ -18,6 +11,8 @@ export const NftCard = ({
   setTokenToSell,
   currentNetwork,
 }) => {
+  const { ref, width } = useElementSize();
+
   const openSeaLink = urljoin(
     config.networks[currentNetwork].openSeaUrl,
     config.contracts.nftContract.contractAddress,
@@ -25,22 +20,28 @@ export const NftCard = ({
   );
 
   return (
-    <Card shadow="sm">
+    <Card shadow="lg">
       <Card.Section>
-        <Image src={nftDetails.tokenMetadata.image} height={160}></Image>
+        <Image
+          src={nftDetails.tokenMetadata.image}
+          ref={ref}
+          height={width}
+          fit="contain"
+        ></Image>
       </Card.Section>
       <Group
         direction="column"
         grow={true}
-        spacing="sm"
+        spacing="xs"
         style={{ marginTop: 5 }}
       >
-        <Text weight="bold">{nftDetails.tokenMetadata.name}</Text>
-        <Text>{nftDetails.tokenMetadata.description}</Text>
-        <Text size="sm">
-          {config.contracts.nftContract.contractAddress} ::{" "}
-          {nftDetails.tokenId.toNumber()}
+        <Text lineClamp={1} color="dimmed">
+          {nftDetails.collectionName}
         </Text>
+        <Text size="lg" weight="bold" lineClamp={1}>
+          {nftDetails.tokenMetadata.name}
+        </Text>
+        <Text>{nftDetails.tokenMetadata.description}</Text>
         <List>
           <List.Item>
             <Anchor href={nftDetails.tokenURI} target="_blank">
@@ -54,7 +55,7 @@ export const NftCard = ({
           </List.Item>
         </List>
         {nftDetails.tokenIsForSale ? (
-          <Badge>For Sale</Badge>
+          <Button disabled={true}>For Sale</Button>
         ) : (
           <Button
             onClick={() => {

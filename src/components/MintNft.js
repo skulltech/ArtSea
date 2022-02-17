@@ -33,7 +33,7 @@ export const MintNft = ({ currentAccount }) => {
       apiPath: process.env.IPFS_PATH,
     });
     const { cid } = await ipfsClient.add({ content: file });
-    return "https://ipfs.io/ipfs/" + cid;
+    return "ipfs://" + cid;
   };
 
   const form = useForm({

@@ -1,4 +1,4 @@
-import { Center, Group, Loader, Modal } from "@mantine/core";
+import { Center, Group, Loader, Modal, SimpleGrid } from "@mantine/core";
 import { useEffect, useState } from "react";
 import getContract from "../../utils/blockchain";
 import { NftCard } from "./NftCard";
@@ -23,6 +23,7 @@ export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
         currentAccount,
         contractInfo: config.contracts.marketContract,
       });
+      const collectionName = await nftContract.name();
       const balance = (await nftContract.balanceOf(currentAccount)).toNumber();
       const nftsOwned = await Promise.all(
         [...Array(balance).keys()].map(async (index) => {
@@ -36,7 +37,13 @@ export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
             config.contracts.nftContract.contractAddress,
             tokenId
           );
-          return { tokenId, tokenURI, tokenMetadata, tokenIsForSale: forSale };
+          return {
+            collectionName,
+            tokenId,
+            tokenURI,
+            tokenMetadata,
+            tokenIsForSale: forSale,
+          };
         })
       );
       console.log(nftsOwned);
@@ -46,37 +53,39 @@ export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
     };
 
     fetchNfts();
-  }, [currentAccount]);
+  }, [currentAccount, setNfts]);
 
-  if (fetchingNfts) {
-    return (
-      <Center padding="lg">
-        <Loader />
-      </Center>
-    );
-  } else {
-    return (
-      <>
-        <Modal
-          opened={sellNftModalOpened}
-          onClose={() => setSellNftModalOpened(false)}
-          title="Sell NFT"
-          overlayOpacity={0.95}
-        >
-          <SellNft currentAccount={currentAccount} tokenToSell={tokenToSell} />
-        </Modal>
-        <Group>
-          {nfts.map((nft) => (
-            <NftCard
-              nftDetails={nft}
-              key={nft.tokenId}
-              setSellNftModalOpened={setSellNftModalOpened}
-              setTokenToSell={setTokenToSell}
-              currentNetwork={currentNetwork}
-            />
-          ))}
-        </Group>
-      </>
-    );
-  }
+  return fetchingNfts ? (
+    <Center padding="lg">
+      <Loader />
+    </Center>
+  ) : (
+    <>
+      <Modal
+        opened={sellNftModalOpened}
+        onClose={() => setSellNftModalOpened(false)}
+        title="Sell NFT"
+        overlayOpacity={0.95}
+      >
+        <SellNft currentAccount={currentAccount} tokenToSell={tokenToSell} />
+      </Modal>
+      <SimpleGrid
+        cols={2}
+        breakpoints={[
+          { maxWidth: "sm", cols: 2 },
+          { maxWidth: "xs", cols: 1 },
+        ]}
+      >
+        {nfts.map((nft) => (
+          <NftCard
+            nftDetails={nft}
+            key={nft.tokenId}
+            setSellNftModalOpened={setSellNftModalOpened}
+            setTokenToSell={setTokenToSell}
+            currentNetwork={currentNetwork}
+          />
+        ))}
+      </SimpleGrid>
+    </>
+  );
 };

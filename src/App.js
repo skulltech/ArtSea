@@ -21,6 +21,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { ListNfts } from "./components/listNfts/ListNfts";
 import { ListAuctions } from "./components/buyNfts/ListAuctions";
 import config from "./utils/config";
+import getContract from "./utils/blockchain";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -64,6 +65,14 @@ export default function App() {
         window.location.reload();
       });
     }
+  });
+
+  useEffect(() => {
+    const marketContract = getContract({
+      currentAccount,
+      contractInfo: config.contracts.marketContract,
+    });
+    marketContract.on("AuctionFinalized", () => {});
   });
 
   return (

@@ -1,4 +1,11 @@
-import { Center, Group, Loader, Modal, NativeSelect } from "@mantine/core";
+import {
+  Center,
+  Group,
+  Loader,
+  Modal,
+  NativeSelect,
+  SimpleGrid,
+} from "@mantine/core";
 import { useEffect } from "react";
 import { useState } from "react/cjs/react.development";
 import getContract from "../../utils/blockchain";
@@ -112,72 +119,68 @@ export const ListAuctions = ({
     setAuctionsToShow(auctions);
   }, [allAuctions, creatorFilter, bidderFilter, currentAccount]);
 
-  if (fetchingAuctions) {
-    return (
-      <Center padding="lg">
-        <Loader />
-      </Center>
-    );
-  } else {
-    return (
-      <>
-        <Modal
-          opened={placeBidModalOpened}
-          onClose={() => setPlaceBidModalOpened(false)}
-          title="Place bid"
-          overlayOpacity={0.95}
-        >
-          <PlaceBid
-            currentAccount={currentAccount}
-            selectedAuction={selectedAuction}
-          />
-        </Modal>
+  return fetchingAuctions ? (
+    <Center padding="lg">
+      <Loader />
+    </Center>
+  ) : (
+    <>
+      <Modal
+        opened={placeBidModalOpened}
+        onClose={() => setPlaceBidModalOpened(false)}
+        title="Place bid"
+        overlayOpacity={0.95}
+      >
+        <PlaceBid
+          currentAccount={currentAccount}
+          selectedAuction={selectedAuction}
+        />
+      </Modal>
 
-        <Modal
-          opened={finalizeAuctionModalOpened}
-          onClose={() => setFinalizeAuctionModalOpened(false)}
-          title={ifSell ? "Sell to current bidder" : "Cancel auction"}
-          overlayOpacity={0.95}
-        >
-          <FinalizeAuction
-            currentAccount={currentAccount}
-            selectedAuction={selectedAuction}
-            ifSell={ifSell}
+      <Modal
+        opened={finalizeAuctionModalOpened}
+        onClose={() => setFinalizeAuctionModalOpened(false)}
+        title={ifSell ? "Sell to current bidder" : "Cancel auction"}
+        overlayOpacity={0.95}
+      >
+        <FinalizeAuction
+          currentAccount={currentAccount}
+          selectedAuction={selectedAuction}
+          ifSell={ifSell}
+        />
+      </Modal>
+      <Group direction="column" grow={true}>
+        <Group position="right">
+          <NativeSelect
+            value={creatorFilter}
+            onChange={(event) => setCreatorFilter(event.currentTarget.value)}
+            data={creatorFilterValues}
+            label="Filter by creator"
+            required
           />
-        </Modal>
-        <Group direction="column" grow={true}>
-          <Group position="right">
-            <NativeSelect
-              value={creatorFilter}
-              onChange={(event) => setCreatorFilter(event.currentTarget.value)}
-              data={creatorFilterValues}
-              label="Filter by creator"
-              required
-            />
-            <NativeSelect
-              value={bidderFilter}
-              onChange={(event) => setBidderFilter(event.currentTarget.value)}
-              data={bidderFilterValues}
-              label="Filter by bidder"
-              required
-            />
-          </Group>
-          <Group>
-            {auctionsToShow.map((auction) => (
-              <AuctionCard
-                auctionDetails={auction}
-                key={auction.auctionId}
-                currentAccount={currentAccount}
-                currentNetwork={currentNetwork}
-                setSelectedAuction={setSelectedAuction}
-                setPlaceBidModalOpened={setPlaceBidModalOpened}
-                setFinalizeAuctionModalOpened={setFinalizeAuctionModalOpened}
-                setIfSell={setIfSell}
-              />
-            ))}
-          </Group>
+          <NativeSelect
+            value={bidderFilter}
+            onChange={(event) => setBidderFilter(event.currentTarget.value)}
+            data={bidderFilterValues}
+            label="Filter by bidder"
+            required
+          />
         </Group>
-      </>
-    );
-  }
+        <SimpleGrid cols={2}>
+          {auctionsToShow.map((auction) => (
+            <AuctionCard
+              auctionDetails={auction}
+              key={auction.auctionId}
+              currentAccount={currentAccount}
+              currentNetwork={currentNetwork}
+              setSelectedAuction={setSelectedAuction}
+              setPlaceBidModalOpened={setPlaceBidModalOpened}
+              setFinalizeAuctionModalOpened={setFinalizeAuctionModalOpened}
+              setIfSell={setIfSell}
+            />
+          ))}
+        </SimpleGrid>
+      </Group>
+    </>
+  );
 };
