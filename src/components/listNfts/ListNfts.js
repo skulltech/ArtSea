@@ -1,10 +1,10 @@
-import { Center, Group, Loader, Modal, SimpleGrid } from "@mantine/core";
+import { Center, Loader, Modal, SimpleGrid } from "@mantine/core";
 import { useEffect, useState } from "react";
-import getContract from "../../utils/blockchain";
 import { NftCard } from "./NftCard";
 import { SellNft } from "./SellNft";
 import config from "../../utils/config";
 import { fetchJson } from "ethers/lib/utils";
+import { ipfsToHttp, getContract } from "../../utils/utils";
 
 export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
   const [sellNftModalOpened, setSellNftModalOpened] = useState(false);
@@ -32,7 +32,7 @@ export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
             index
           );
           const tokenURI = await nftContract.tokenURI(tokenId);
-          const tokenMetadata = await fetchJson(tokenURI);
+          const tokenMetadata = await fetchJson(ipfsToHttp(tokenURI));
           const forSale = await marketContract.tokenIsForSale(
             config.contracts.nftContract.contractAddress,
             tokenId

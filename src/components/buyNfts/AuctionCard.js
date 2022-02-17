@@ -19,7 +19,7 @@ export const AuctionCard = ({
   return (
     <InfoCard
       currentNetwork={currentNetwork}
-      nftImageUrl={auctionDetails.nftMetadata.image}
+      nftImageUri={auctionDetails.nftMetadata.image}
       nftCollectionName={auctionDetails.nftCollectionName}
       nftName={auctionDetails.nftMetadata.name}
       nftDescription={auctionDetails.nftMetadata.description}

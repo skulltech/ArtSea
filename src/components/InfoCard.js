@@ -3,10 +3,11 @@ import { useElementSize } from "@mantine/hooks";
 import { RiExternalLinkLine } from "react-icons/ri";
 import urljoin from "url-join";
 import config from "../utils/config";
+import { ipfsToHttp } from "../utils/utils";
 
 export const InfoCard = ({
   currentNetwork,
-  nftImageUrl,
+  nftImageUri,
   nftCollectionName,
   nftName,
   nftDescription,
@@ -25,7 +26,12 @@ export const InfoCard = ({
   return (
     <Card shadow="lg">
       <Card.Section>
-        <Image src={nftImageUrl} ref={ref} height={width} fit="contain"></Image>
+        <Image
+          src={ipfsToHttp(nftImageUri)}
+          ref={ref}
+          height={width}
+          fit="contain"
+        ></Image>
       </Card.Section>
       <Group
         direction="column"
@@ -42,7 +48,7 @@ export const InfoCard = ({
         <Text>{nftDescription}</Text>
         <List>
           <List.Item>
-            <Anchor href={nftMetadataUri} target="_blank">
+            <Anchor href={ipfsToHttp(nftMetadataUri)} target="_blank">
               Token Metadata <RiExternalLinkLine />
             </Anchor>
           </List.Item>

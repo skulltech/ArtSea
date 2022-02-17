@@ -21,7 +21,7 @@ import { ModalsProvider } from "@mantine/modals";
 import { ListNfts } from "./components/listNfts/ListNfts";
 import { ListAuctions } from "./components/buyNfts/ListAuctions";
 import config from "./utils/config";
-import getContract from "./utils/blockchain";
+import { getContract } from "./utils/utils";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);

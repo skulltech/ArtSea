@@ -11,7 +11,7 @@ export const NftCard = ({
   return (
     <InfoCard
       currentNetwork={currentNetwork}
-      nftImageUrl={nftDetails.tokenMetadata.image}
+      nftImageUri={nftDetails.tokenMetadata.image}
       nftCollectionName={nftDetails.collectionName}
       nftName={nftDetails.tokenMetadata.name}
       nftDescription={nftDetails.tokenMetadata.description}

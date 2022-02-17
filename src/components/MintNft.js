@@ -2,11 +2,11 @@ import { Button, Group, TextInput, Text, Image, Anchor } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { useForm } from "@mantine/hooks";
 import { IoImageOutline } from "react-icons/io5";
-import { create } from "ipfs-http-client";
 import { useState } from "react";
-import getContract from "../utils/blockchain";
+import { getContract } from "../utils/utils";
 import { useModals } from "@mantine/modals";
 import config from "../utils/config.js";
+import { NFTStorage } from "nft.storage";
 
 export const MintNft = ({ currentAccount }) => {
   const [minting, setMinting] = useState(false);
@@ -26,16 +26,6 @@ export const MintNft = ({ currentAccount }) => {
     });
   };
 
-  const uploadToIpfs = async (file) => {
-    const ipfsClient = create({
-      host: process.env.IPFS_HOST,
-      port: 5001,
-      apiPath: process.env.IPFS_PATH,
-    });
-    const { cid } = await ipfsClient.add({ content: file });
-    return "ipfs://" + cid;
-  };
-
   const form = useForm({
     initialValues: {
       name: "",
@@ -49,20 +39,20 @@ export const MintNft = ({ currentAccount }) => {
     let tokenId;
 
     try {
-      const imageUrl = await uploadToIpfs(values.image);
-      console.log("Image uploaded to IPFS at:", imageUrl);
-      const metadata = {
+      const nft = {
+        image: values.image,
         name: values.name,
         description: values.description,
-        image: imageUrl,
       };
-      const metadataUrl = await uploadToIpfs(JSON.stringify(metadata));
-      console.log("Metadata uploaded to IPFS at:", metadataUrl);
+      const client = new NFTStorage({ token: config.nftStorage.key });
+      const metadata = await client.store(nft);
+      console.log("NFT data stored!");
+      console.log("Metadata URI: ", metadata.url);
       const nftContract = getContract({
         currentAccount,
         contractInfo: config.contracts.nftContract,
       });
-      let txn = await nftContract.safeMint(currentAccount, metadataUrl);
+      let txn = await nftContract.safeMint(currentAccount, metadata.url);
       console.log("Transaction hash for minting the NFT:", txn.hash);
       const receipt = await txn.wait();
       console.log("Transaction receipt:", receipt);

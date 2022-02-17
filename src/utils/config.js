@@ -21,6 +21,12 @@ const config = {
       openSeaUrl: configJson.mumbaiOpenSeaUrl,
     },
   },
+  nftStorage: {
+    key: process.env.REACT_APP_NFT_STORAGE_KEY,
+  },
+  ipfs: {
+    gateway: "https://ipfs.io",
+  },
 };
 
 export default config;

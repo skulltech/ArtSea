@@ -1,6 +1,8 @@
 import { ethers } from "ethers";
+import urljoin from "url-join";
+import config from "./config";
 
-const getContract = ({ currentAccount, contractInfo }) => {
+export const getContract = ({ currentAccount, contractInfo }) => {
   const { ethereum } = window;
   if (!ethereum) {
     console.log("Ethereum object not found");
@@ -15,4 +17,14 @@ const getContract = ({ currentAccount, contractInfo }) => {
   );
   return contract;
 };
-export default getContract;
+
+export const minifyAddress = (address) => {
+  return address.slice(0, 5) + "..." + address.slice(-4);
+};
+
+export const ipfsToHttp = (uri) => {
+  if (uri.startsWith("ipfs://")) {
+    return urljoin(config.ipfs.gateway, "ipfs", uri.slice(7));
+  }
+  return uri;
+};

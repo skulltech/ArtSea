@@ -1,6 +1,6 @@
 import { Group, Text, Button } from "@mantine/core";
 import { useState } from "react";
-import getContract from "../../utils/blockchain";
+import { getContract } from "../../utils/utils";
 import config from "../../utils/config";
 import ERC721Abi from "@solidstate/abi/ERC721.json";
 

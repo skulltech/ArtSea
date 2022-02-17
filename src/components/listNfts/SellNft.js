@@ -2,7 +2,7 @@ import { Button, Group, NumberInput } from "@mantine/core";
 import { useForm } from "@mantine/hooks";
 import { parseEther } from "ethers/lib/utils";
 import { useState } from "react";
-import getContract from "../../utils/blockchain";
+import { getContract } from "../../utils/utils";
 import config from "../../utils/config";
 
 export const SellNft = ({ currentAccount, tokenToSell }) => {

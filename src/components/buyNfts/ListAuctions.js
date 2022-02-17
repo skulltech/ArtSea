@@ -8,13 +8,13 @@ import {
 } from "@mantine/core";
 import { useEffect } from "react";
 import { useState } from "react/cjs/react.development";
-import getContract from "../../utils/blockchain";
 import config from "../../utils/config";
 import { AuctionCard } from "./AuctionCard";
 import { FinalizeAuction } from "./FinalizeAuction";
 import { PlaceBid } from "./PlaceBid";
 import ERC721MetadataAbi from "@solidstate/abi/ERC721Metadata.json";
 import { fetchJson } from "ethers/lib/utils";
+import { ipfsToHttp, getContract } from "../../utils/utils";
 
 export const ListAuctions = ({
   currentAccount,
@@ -73,7 +73,7 @@ export const ListAuctions = ({
             const nftMetadataURI = await nftContract.tokenURI(
               auctionInfo.tokenId
             );
-            const nftMetadata = await fetchJson(nftMetadataURI);
+            const nftMetadata = await fetchJson(ipfsToHttp(nftMetadataURI));
             const nftCollectionName = await nftContract.name();
             return {
               ...auctionInfo,
