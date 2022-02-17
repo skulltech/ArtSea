@@ -32,7 +32,15 @@ export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
             index
           );
           const tokenURI = await nftContract.tokenURI(tokenId);
-          const tokenMetadata = await fetchJson(ipfsToHttp(tokenURI));
+          let tokenMetadata;
+          try {
+            tokenMetadata = await fetchJson({
+              url: ipfsToHttp(tokenURI),
+              timeout: 3 * 1000,
+            });
+          } catch (error) {
+            console.log(error);
+          }
           const forSale = await marketContract.tokenIsForSale(
             config.contracts.nftContract.contractAddress,
             tokenId

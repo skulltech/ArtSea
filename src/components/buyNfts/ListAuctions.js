@@ -59,7 +59,12 @@ export const ListAuctions = ({
             const nftMetadataURI = await nftContract.tokenURI(
               auctionInfo.tokenId
             );
-            const nftMetadata = await fetchJson(ipfsToHttp(nftMetadataURI));
+            let nftMetadata;
+            try {
+              nftMetadata = await fetchJson(ipfsToHttp(nftMetadataURI));
+            } catch (error) {
+              console.log(error);
+            }
             const nftCollectionName = await nftContract.name();
             return {
               ...auctionInfo,

@@ -27,10 +27,11 @@ export const InfoCard = ({
     <Card shadow="lg">
       <Card.Section>
         <Image
-          src={ipfsToHttp(nftImageUri)}
+          src={nftImageUri ? ipfsToHttp(nftImageUri) : null}
           ref={ref}
           height={width}
           fit="contain"
+          withPlaceholder={true}
         ></Image>
       </Card.Section>
       <Group
@@ -45,7 +46,13 @@ export const InfoCard = ({
         <Text size="lg" weight="bold" lineClamp={1}>
           {nftName}
         </Text>
-        <Text>{nftDescription}</Text>
+        {nftDescription ? (
+          <Text lineClamp={1}>{nftDescription}</Text>
+        ) : (
+          <Text lineClamp={1} color="dimmed">
+            No description available
+          </Text>
+        )}
         <List>
           <List.Item>
             <Anchor href={ipfsToHttp(nftMetadataUri)} target="_blank">

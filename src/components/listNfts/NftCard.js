@@ -11,10 +11,18 @@ export const NftCard = ({
   return (
     <InfoCard
       currentNetwork={currentNetwork}
-      nftImageUri={nftDetails.tokenMetadata.image}
+      nftImageUri={
+        nftDetails.tokenMetadata ? nftDetails.tokenMetadata.image : null
+      }
       nftCollectionName={nftDetails.collectionName}
-      nftName={nftDetails.tokenMetadata.name}
-      nftDescription={nftDetails.tokenMetadata.description}
+      nftName={
+        nftDetails.tokenMetadata
+          ? nftDetails.tokenMetadata.name
+          : nftDetails.tokenId.toString()
+      }
+      nftDescription={
+        nftDetails.tokenMetadata ? nftDetails.tokenMetadata.description : null
+      }
       nftMetadataUri={nftDetails.tokenURI}
       nftContractAddress={config.contracts.nftContract.contractAddress}
       nftId={nftDetails.tokenId.toString()}

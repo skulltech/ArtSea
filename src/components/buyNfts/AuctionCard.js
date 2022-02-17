@@ -95,10 +95,20 @@ export const AuctionCard = ({
       <LoadingOverlay visible={transacting} />
       <InfoCard
         currentNetwork={currentNetwork}
-        nftImageUri={auctionDetails.nftMetadata.image}
+        nftImageUri={
+          auctionDetails.nftMetadata ? auctionDetails.nftMetadata.image : null
+        }
         nftCollectionName={auctionDetails.nftCollectionName}
-        nftName={auctionDetails.nftMetadata.name}
-        nftDescription={auctionDetails.nftMetadata.description}
+        nftName={
+          auctionDetails.nftMetadata
+            ? auctionDetails.nftMetadata.name
+            : auctionDetails.tokenId.toString()
+        }
+        nftDescription={
+          auctionDetails.nftMetadata
+            ? auctionDetails.nftMetadata.description
+            : null
+        }
         nftMetadataUri={auctionDetails.nftMetadataURI}
         nftContractAddress={auctionDetails.tokenAddress}
         nftId={auctionDetails.tokenId.toString()}
