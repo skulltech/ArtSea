@@ -1,14 +1,11 @@
-import { Center, Loader, Modal, SimpleGrid } from "@mantine/core";
+import { Center, Loader, SimpleGrid } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { NftCard } from "./NftCard";
-import { SellNft } from "./SellNft";
 import config from "../../utils/config";
 import { fetchJson } from "ethers/lib/utils";
 import { ipfsToHttp, getContract } from "../../utils/utils";
 
 export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
-  const [sellNftModalOpened, setSellNftModalOpened] = useState(false);
-  const [tokenToSell, setTokenToSell] = useState(null);
   const [fetchingNfts, setFetchingNfts] = useState(false);
 
   useEffect(() => {
@@ -68,32 +65,21 @@ export const ListNfts = ({ currentAccount, currentNetwork, nfts, setNfts }) => {
       <Loader />
     </Center>
   ) : (
-    <>
-      <Modal
-        opened={sellNftModalOpened}
-        onClose={() => setSellNftModalOpened(false)}
-        title="Sell NFT"
-        overlayOpacity={0.95}
-      >
-        <SellNft currentAccount={currentAccount} tokenToSell={tokenToSell} />
-      </Modal>
-      <SimpleGrid
-        cols={2}
-        breakpoints={[
-          { maxWidth: "sm", cols: 2 },
-          { maxWidth: "xs", cols: 1 },
-        ]}
-      >
-        {nfts.map((nft) => (
-          <NftCard
-            nftDetails={nft}
-            key={nft.tokenId}
-            setSellNftModalOpened={setSellNftModalOpened}
-            setTokenToSell={setTokenToSell}
-            currentNetwork={currentNetwork}
-          />
-        ))}
-      </SimpleGrid>
-    </>
+    <SimpleGrid
+      cols={2}
+      breakpoints={[
+        { maxWidth: "sm", cols: 2 },
+        { maxWidth: "xs", cols: 1 },
+      ]}
+    >
+      {nfts.map((nft) => (
+        <NftCard
+          nftDetails={nft}
+          key={nft.tokenId}
+          currentNetwork={currentNetwork}
+          currentAccount={currentAccount}
+        />
+      ))}
+    </SimpleGrid>
   );
 };

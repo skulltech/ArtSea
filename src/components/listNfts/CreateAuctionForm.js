@@ -1,21 +1,23 @@
 import { Button, Group, NumberInput } from "@mantine/core";
 import { useForm } from "@mantine/hooks";
 import { parseEther } from "ethers/lib/utils";
-import { useState } from "react";
 import { getContract } from "../../utils/utils";
 import config from "../../utils/config";
 
-export const SellNft = ({ currentAccount, tokenToSell }) => {
+export const CreateAuctionForm = ({
+  currentAccount,
+  tokenId,
+  setTransacting,
+}) => {
   const form = useForm({
     initialValues: {
       minBidAmount: null,
       tokenId: null,
     },
   });
-  const [creatingAuction, setCreatingAuction] = useState(false);
 
   const createAuction = async () => {
-    setCreatingAuction(true);
+    setTransacting(true);
 
     const marketContract = getContract({
       currentAccount,
@@ -23,7 +25,7 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
     });
     const txn = await marketContract.createAuction(
       config.contracts.nftContract.contractAddress,
-      tokenToSell,
+      tokenId,
       parseEther(form.values.minBidAmount.toString())
     );
     console.log("Transaction hash for creating auction:", txn.hash);
@@ -35,7 +37,7 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
     const auctionId = auctionCreatedEvent.args[0].toString();
     console.log("Transaction done, auction ID:", auctionId);
 
-    setCreatingAuction(false);
+    setTransacting(false);
   };
 
   return (
@@ -48,8 +50,8 @@ export const SellNft = ({ currentAccount, tokenToSell }) => {
           precision={18}
           {...form.getInputProps("minBidAmount")}
         />
-        <Button type="submit" loading={creatingAuction}>
-          {creatingAuction ? "Creating Auction" : "Place your auction"}
+        <Button type="submit" onClick={createAuction}>
+          Create Auction
         </Button>
       </Group>
     </form>
