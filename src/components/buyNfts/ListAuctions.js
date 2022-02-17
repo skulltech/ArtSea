@@ -74,12 +74,14 @@ export const ListAuctions = ({
               auctionInfo.tokenId
             );
             const nftMetadata = await fetchJson(nftMetadataURI);
+            const nftCollectionName = await nftContract.name();
             return {
               ...auctionInfo,
               auctionId,
               bidders,
               nftMetadataURI,
               nftMetadata,
+              nftCollectionName,
             };
           })
         );
@@ -93,7 +95,7 @@ export const ListAuctions = ({
     };
 
     fetchAuctions();
-  }, [currentAccount]);
+  }, [currentAccount, setAllAuctions]);
 
   useEffect(() => {
     const creatorFilterFuncs = {
