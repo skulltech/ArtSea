@@ -1,4 +1,12 @@
-import { Center, Group, Loader, NativeSelect, SimpleGrid } from "@mantine/core";
+import {
+  Button,
+  Center,
+  Divider,
+  Group,
+  Loader,
+  NativeSelect,
+  SimpleGrid,
+} from "@mantine/core";
 import { useEffect } from "react";
 import { useState } from "react/cjs/react.development";
 import config from "../../utils/config";
@@ -118,22 +126,26 @@ export const ListAuctions = ({
     </Center>
   ) : (
     <Group direction="column" grow={true}>
-      <Group position="right">
-        <NativeSelect
-          value={creatorFilter}
-          onChange={(event) => setCreatorFilter(event.currentTarget.value)}
-          data={creatorFilterValues}
-          label="Filter by creator"
-          required
-        />
-        <NativeSelect
-          value={bidderFilter}
-          onChange={(event) => setBidderFilter(event.currentTarget.value)}
-          data={bidderFilterValues}
-          label="Filter by bidder"
-          required
-        />
+      <Group position="apart">
+        <Group position="left">
+          <NativeSelect
+            value={creatorFilter}
+            onChange={(event) => setCreatorFilter(event.currentTarget.value)}
+            data={creatorFilterValues}
+            label="Filter by creator"
+            required
+          />
+          <NativeSelect
+            value={bidderFilter}
+            onChange={(event) => setBidderFilter(event.currentTarget.value)}
+            data={bidderFilterValues}
+            label="Filter by bidder"
+            required
+          />
+        </Group>
+        <Button>Create Auction</Button>
       </Group>
+      <Divider />
       <SimpleGrid cols={2}>
         {auctionsToShow.map((auction) => (
           <AuctionCard

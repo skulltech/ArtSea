@@ -11,6 +11,8 @@ import {
   Container,
   Center,
   useMantineTheme,
+  Navbar,
+  SegmentedControl,
 } from "@mantine/core";
 import { HiOutlineCloudUpload } from "react-icons/hi";
 import { GiAtSea } from "react-icons/gi";
@@ -27,13 +29,32 @@ export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
   const [currentNetwork, setCurrentNetwork] = useState(null);
   const [metamaskInstalled, setMetamaskInstalled] = useState(false);
-  const [activeTab, setActiveTab] = useState(1);
-  const [nfts, setNfts] = useState([]);
+  const [activeNav, setActiveNav] = useState("market");
+  const [allNfts, setAllNfts] = useState([]);
   const [allAuctions, setAllAuctions] = useState([]);
 
   const theme = useMantineTheme();
 
   const validNetwork = Object.keys(config.networks).includes(currentNetwork);
+
+  const mainContents = {
+    market: (
+      <ListAuctions
+        currentAccount={currentAccount}
+        currentNetwork={currentNetwork}
+        allAuctions={allAuctions}
+        setAllAuctions={setAllAuctions}
+      />
+    ),
+    myNfts: (
+      <ListNfts
+        currentAccount={currentAccount}
+        currentNetwork={currentNetwork}
+        allNfts={allNfts}
+        setAllNfts={setAllNfts}
+      />
+    ),
+  };
 
   const checkIfWalletIsConnected = async () => {
     const { ethereum } = window;
@@ -114,32 +135,36 @@ export default function App() {
                 </Group>
               </Header>
             }
+            navbar={
+              metamaskInstalled &&
+              currentNetwork &&
+              validNetwork && (
+                <Navbar width={{ base: 300 }}>
+                  <Navbar.Section>
+                    <SegmentedControl
+                      fullWidth
+                      orientation="vertical"
+                      styles={{
+                        root: { backgroundColor: "inherit" },
+                      }}
+                      size="md"
+                      data={[
+                        { value: "market", label: "Market" },
+                        { value: "myNfts", label: "My Arts" },
+                      ]}
+                      value={activeNav}
+                      onChange={setActiveNav}
+                    />
+                  </Navbar.Section>
+                </Navbar>
+              )
+            }
           >
-            <Container size="sm">
+            <Container size="xl">
               {metamaskInstalled ? (
                 currentAccount ? (
                   validNetwork ? (
-                    <Tabs activeTab={activeTab} onTabChange={setActiveTab}>
-                      <Tabs.Tab label="Mint" icon={<HiOutlineCloudUpload />}>
-                        <MintNft currentAccount={currentAccount} />
-                      </Tabs.Tab>
-                      <Tabs.Tab label="My Arts" icon={<BsListUl />}>
-                        <ListNfts
-                          currentAccount={currentAccount}
-                          currentNetwork={currentNetwork}
-                          nfts={nfts}
-                          setNfts={setNfts}
-                        />
-                      </Tabs.Tab>
-                      <Tabs.Tab label="Buy" icon={<AiOutlineShopping />}>
-                        <ListAuctions
-                          currentAccount={currentAccount}
-                          currentNetwork={currentNetwork}
-                          allAuctions={allAuctions}
-                          setAllAuctions={setAllAuctions}
-                        />
-                      </Tabs.Tab>
-                    </Tabs>
+                    mainContents[activeNav]
                   ) : (
                     <Center>
                       <Text>
