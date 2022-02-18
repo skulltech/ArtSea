@@ -26,7 +26,10 @@ export const NftCard = ({ nftDetails, currentAccount, currentNetwork }) => {
       {nftDetails.tokenIsForSale ? (
         <Button disabled={true}>For Sale</Button>
       ) : (
-        <CreateAuctionButton tokenId={nftDetails.tokenId.toString()}>
+        <CreateAuctionButton
+          tokenAddress={config.contracts.nftContract.contractAddress}
+          tokenId={nftDetails.tokenId.toString()}
+        >
           Sell this NFT
         </CreateAuctionButton>
       )}

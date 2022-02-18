@@ -1,4 +1,4 @@
-import { Button, Group, NumberInput } from "@mantine/core";
+import { Button, Group, NumberInput, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/hooks";
 import { useModals } from "@mantine/modals";
 import { useNotifications } from "@mantine/notifications";
@@ -9,10 +9,12 @@ import { IoAlertCircleSharp } from "react-icons/io5";
 import config from "../utils/config";
 import { getContract } from "../utils/utils";
 
-const CreateAuctionForm = ({ setFormValues }) => {
+const CreateAuctionForm = ({ setFormValues, tokenAddress, tokenId }) => {
   const form = useForm({
     initialValues: {
       minBidAmount: null,
+      tokenAddress: tokenAddress,
+      tokenId: tokenId,
     },
   });
 
@@ -23,6 +25,20 @@ const CreateAuctionForm = ({ setFormValues }) => {
   return (
     <form>
       <Group direction="column" grow="true">
+        <TextInput
+          placeholder="NFT contract address"
+          label="NFT contract address"
+          required
+          {...form.getInputProps("tokenAddress")}
+          disabled={tokenAddress}
+        />
+        <TextInput
+          placeholder="NFT token ID"
+          label="NFT token ID"
+          required
+          {...form.getInputProps("tokenId")}
+          disabled={tokenId}
+        />
         <NumberInput
           placeholder="Minimum bid amount in $MATIC"
           label="Minimum bid amount in $MATIC"
@@ -37,6 +53,7 @@ const CreateAuctionForm = ({ setFormValues }) => {
 
 export const CreateAuctionButton = ({
   currentAccount,
+  tokenAddress,
   tokenId,
   buttonProps,
   children,
@@ -60,8 +77,8 @@ export const CreateAuctionButton = ({
         contractInfo: config.contracts.marketContract,
       });
       const txn = await marketContract.createAuction(
-        config.contracts.nftContract.contractAddress,
-        tokenId,
+        formValues.tokenAddress,
+        formValues.tokenId,
         parseEther(formValues.minBidAmount.toString())
       );
       console.log("Transaction hash for creating auction:", txn.hash);
@@ -100,7 +117,13 @@ export const CreateAuctionButton = ({
   const openCreateAuctionModal = () => {
     modals.openConfirmModal({
       title: "Create Auction",
-      children: <CreateAuctionForm setFormValues={setFormValues} />,
+      children: (
+        <CreateAuctionForm
+          setFormValues={setFormValues}
+          tokenAddress={tokenAddress}
+          tokenId={tokenId}
+        />
+      ),
       onConfirm: () => createAuction(formValues),
     });
   };
