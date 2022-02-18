@@ -11,6 +11,7 @@ import {
   Tabs,
   Container,
   Center,
+  useMantineTheme,
 } from "@mantine/core";
 import { HiOutlineCloudUpload } from "react-icons/hi";
 import { GiAtSea } from "react-icons/gi";
@@ -30,6 +31,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState(1);
   const [nfts, setNfts] = useState([]);
   const [allAuctions, setAllAuctions] = useState([]);
+
+  const theme = useMantineTheme();
 
   const validNetwork = Object.keys(config.networks).includes(currentNetwork);
 
@@ -93,6 +96,14 @@ export default function App() {
                   <Group>
                     <GiAtSea />
                     <Text weight="bold">ArtSea</Text>
+                    {validNetwork && (
+                      <Text
+                        color="dimmed"
+                        sx={{ fontFamily: theme.fontFamilyMonospace }}
+                      >
+                        @{config.networks[currentNetwork].name}
+                      </Text>
+                    )}
                   </Group>
                   {metamaskInstalled && (
                     <ConnectWallet

@@ -1,5 +1,6 @@
 import { Badge, Button } from "@mantine/core";
 import { useState } from "react";
+import { minifyAddress } from "../utils/utils";
 
 export const ConnectWallet = ({
   currentAccount,
@@ -37,7 +38,7 @@ export const ConnectWallet = ({
         sx={{ textTransform: "none" }}
         size="lg"
       >
-        {"Connected to " + currentAccount}
+        {"Connected to " + minifyAddress(currentAccount)}
       </Badge>
     );
   } else {
