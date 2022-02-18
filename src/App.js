@@ -11,6 +11,7 @@ import {
   useMantineTheme,
   Navbar,
   SegmentedControl,
+  Button,
 } from "@mantine/core";
 import { GiAtSea } from "react-icons/gi";
 import { NotificationsProvider } from "@mantine/notifications";
@@ -19,6 +20,7 @@ import { ListNfts } from "./components/listNfts/ListNfts";
 import { ListAuctions } from "./components/listAuctions/ListAuctions";
 import config from "./utils/config";
 import { getContract } from "./utils/utils";
+import { HiOutlineCloudUpload } from "react-icons/hi";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -150,6 +152,14 @@ export default function App() {
                       value={activeNav}
                       onChange={setActiveNav}
                     />
+                  </Navbar.Section>
+                  <Navbar.Section>
+                    <Group direction="column" grow={true}>
+                      <Button leftIcon={<HiOutlineCloudUpload />}>
+                        Mint an NFT
+                      </Button>
+                      <Button>Create Auction</Button>
+                    </Group>
                   </Navbar.Section>
                 </Navbar>
               )

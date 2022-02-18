@@ -1,5 +1,4 @@
 import {
-  Button,
   Center,
   Divider,
   Group,
@@ -12,7 +11,6 @@ import { NftCard } from "./NftCard";
 import config from "../../utils/config";
 import { fetchJson } from "ethers/lib/utils";
 import { ipfsToHttp, getContract } from "../../utils/utils";
-import { HiOutlineCloudUpload } from "react-icons/hi";
 
 export const ListNfts = ({
   currentAccount,
@@ -107,7 +105,6 @@ export const ListNfts = ({
           label="Filter by sale status"
           required
         />
-        <Button leftIcon={<HiOutlineCloudUpload />}>Mint an NFT</Button>
       </Group>
       <Divider label="NFTs" />
       <SimpleGrid

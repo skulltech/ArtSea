@@ -143,7 +143,6 @@ export const ListAuctions = ({
             required
           />
         </Group>
-        <Button>Create Auction</Button>
       </Group>
       <Divider />
       <SimpleGrid cols={2}>
