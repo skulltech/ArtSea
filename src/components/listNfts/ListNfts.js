@@ -1,25 +1,8 @@
-import {
-  Center,
-  Divider,
-  Group,
-  Loader,
-  NativeSelect,
-  SimpleGrid,
-} from "@mantine/core";
+import { Divider, Group, NativeSelect, SimpleGrid } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { NftCard } from "./NftCard";
-import config from "../../utils/config";
-import { fetchJson } from "ethers/lib/utils";
-import { ipfsToHttp, getContract } from "../../utils/utils";
 
-export const ListNfts = ({
-  currentAccount,
-  currentNetwork,
-  allNfts,
-  setAllNfts,
-}) => {
-  const [fetchingNfts, setFetchingNfts] = useState(false);
-
+export const ListNfts = ({ currentAccount, currentNetwork, allNfts }) => {
   const [forSaleFilter, setForSaleFilter] = useState("all");
   const [nftsToShow, setNftsToShow] = useState([]);
 
@@ -28,58 +11,6 @@ export const ListNfts = ({
     { value: "notForSale", label: "Not for sale" },
     { value: "all", label: "All" },
   ];
-
-  useEffect(() => {
-    const fetchNfts = async () => {
-      setFetchingNfts(true);
-
-      const nftContract = getContract({
-        currentAccount,
-        contractInfo: config.contracts.nftContract,
-      });
-      const marketContract = getContract({
-        currentAccount,
-        contractInfo: config.contracts.marketContract,
-      });
-      const collectionName = await nftContract.name();
-      const balance = (await nftContract.balanceOf(currentAccount)).toNumber();
-      const nftsOwned = await Promise.all(
-        [...Array(balance).keys()].map(async (index) => {
-          const tokenId = await nftContract.tokenOfOwnerByIndex(
-            currentAccount,
-            index
-          );
-          const tokenURI = await nftContract.tokenURI(tokenId);
-          let tokenMetadata;
-          try {
-            tokenMetadata = await fetchJson({
-              url: ipfsToHttp(tokenURI),
-              timeout: 3 * 1000,
-            });
-          } catch (error) {
-            console.log(error);
-          }
-          const forSale = await marketContract.tokenIsForSale(
-            config.contracts.nftContract.contractAddress,
-            tokenId
-          );
-          return {
-            collectionName,
-            tokenId,
-            tokenURI,
-            tokenMetadata,
-            tokenIsForSale: forSale,
-          };
-        })
-      );
-      console.log(nftsOwned);
-      setAllNfts(nftsOwned);
-
-      setFetchingNfts(false);
-    };
-
-    fetchNfts();
-  }, [currentAccount, setAllNfts]);
 
   useEffect(() => {
     const forSaleFilterFuncs = {
@@ -91,11 +22,7 @@ export const ListNfts = ({
     setNftsToShow(nfts);
   }, [allNfts, forSaleFilter, currentAccount]);
 
-  return fetchingNfts ? (
-    <Center padding="lg">
-      <Loader />
-    </Center>
-  ) : (
+  return (
     <Group direction="column" grow={true}>
       <Group position="apart">
         <NativeSelect

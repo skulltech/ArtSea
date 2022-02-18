@@ -1,28 +1,13 @@
-import {
-  Button,
-  Center,
-  Divider,
-  Group,
-  Loader,
-  NativeSelect,
-  SimpleGrid,
-} from "@mantine/core";
-import { useEffect } from "react";
-import { useState } from "react/cjs/react.development";
-import config from "../../utils/config";
+import { Divider, Group, NativeSelect, SimpleGrid } from "@mantine/core";
+import { useEffect, useState } from "react";
 import { AuctionCard } from "./AuctionCard";
-import ERC721MetadataAbi from "@solidstate/abi/ERC721Metadata.json";
-import { fetchJson } from "ethers/lib/utils";
-import { ipfsToHttp, getContract } from "../../utils/utils";
 
 export const ListAuctions = ({
   currentAccount,
   currentNetwork,
   allAuctions,
-  setAllAuctions,
 }) => {
   const [auctionsToShow, setAuctionsToShow] = useState([]);
-  const [fetchingAuctions, setFetchingAuctions] = useState(false);
 
   const [creatorFilter, setCreatorFilter] = useState("all");
   const creatorFilterValues = [
@@ -37,64 +22,6 @@ export const ListAuctions = ({
     { value: "others", label: "Bid on by others" },
     { value: "all", label: "All" },
   ];
-
-  useEffect(() => {
-    const fetchAuctions = async () => {
-      setFetchingAuctions(true);
-
-      try {
-        const marketContract = getContract({
-          currentAccount,
-          contractInfo: config.contracts.marketContract,
-        });
-        const bidPlacedEvents = await marketContract.queryFilter(
-          marketContract.filters.BidPlaced()
-        );
-        const auctionIds = await marketContract.liveAuctionIds();
-        const auctions = await Promise.all(
-          auctionIds.map(async (auctionId) => {
-            const auctionInfo = await marketContract.auctions(auctionId);
-            const bidders = bidPlacedEvents
-              .filter((value) => value.args.auctionId === auctionId)
-              .map((event) => event.args.bidder);
-            const nftContract = getContract({
-              currentAccount,
-              contractInfo: {
-                contractAbi: ERC721MetadataAbi,
-                contractAddress: auctionInfo.tokenAddress,
-              },
-            });
-            const nftMetadataURI = await nftContract.tokenURI(
-              auctionInfo.tokenId
-            );
-            let nftMetadata;
-            try {
-              nftMetadata = await fetchJson(ipfsToHttp(nftMetadataURI));
-            } catch (error) {
-              console.log(error);
-            }
-            const nftCollectionName = await nftContract.name();
-            return {
-              ...auctionInfo,
-              auctionId,
-              bidders,
-              nftMetadataURI,
-              nftMetadata,
-              nftCollectionName,
-            };
-          })
-        );
-        console.log(auctions);
-        setAllAuctions(auctions);
-      } catch (error) {
-        console.log(error);
-      }
-
-      setFetchingAuctions(false);
-    };
-
-    fetchAuctions();
-  }, [currentAccount, setAllAuctions]);
 
   useEffect(() => {
     const creatorFilterFuncs = {
@@ -120,11 +47,7 @@ export const ListAuctions = ({
     setAuctionsToShow(auctions);
   }, [allAuctions, creatorFilter, bidderFilter, currentAccount]);
 
-  return fetchingAuctions ? (
-    <Center padding="lg">
-      <Loader />
-    </Center>
-  ) : (
+  return (
     <Group direction="column" grow={true}>
       <Group position="apart">
         <Group position="left">
