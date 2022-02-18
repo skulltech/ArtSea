@@ -1,3 +1,6 @@
+import { MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
+import { NotificationsProvider } from "@mantine/notifications";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
@@ -5,7 +8,19 @@ import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <MantineProvider
+      theme={{
+        textSizes: {
+          md: "14px",
+        },
+      }}
+    >
+      <NotificationsProvider>
+        <ModalsProvider labels={{ confirm: "Confirm", cancel: "Cancel" }}>
+          <App />
+        </ModalsProvider>
+      </NotificationsProvider>
+    </MantineProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

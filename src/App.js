@@ -5,7 +5,6 @@ import {
   Header,
   Group,
   Text,
-  MantineProvider,
   Container,
   Center,
   useMantineTheme,
@@ -14,8 +13,6 @@ import {
   Button,
 } from "@mantine/core";
 import { GiAtSea } from "react-icons/gi";
-import { NotificationsProvider } from "@mantine/notifications";
-import { ModalsProvider } from "@mantine/modals";
 import { ListNfts } from "./components/listNfts/ListNfts";
 import { ListAuctions } from "./components/listAuctions/ListAuctions";
 import config from "./utils/config";
@@ -23,6 +20,9 @@ import { ipfsToHttp, getContract } from "./utils/utils";
 import { HiOutlineCloudUpload } from "react-icons/hi";
 import ERC721MetadataAbi from "@solidstate/abi/ERC721Metadata.json";
 import { fetchJson } from "ethers/lib/utils";
+import { MintNftButton } from "./components/MintNftButton";
+import { useModals } from "@mantine/modals";
+import { CreateAuctionButton } from "./components/CreateAuctionButton";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -210,102 +210,92 @@ export default function App() {
   });
 
   return (
-    <MantineProvider
-      theme={{
-        textSizes: {
-          md: "14px",
-        },
-      }}
-    >
-      <NotificationsProvider>
-        <ModalsProvider labels={{ confirm: "Confirm", cancel: "Cancel" }}>
-          <AppShell
-            padding="md"
-            header={
-              <Header height={60} padding="xs">
-                <Group position="apart">
-                  <Group>
-                    <GiAtSea />
-                    <Text weight="bold">ArtSea</Text>
-                    {validNetwork && (
-                      <Text
-                        color="dimmed"
-                        sx={{ fontFamily: theme.fontFamilyMonospace }}
-                      >
-                        @{config.networks[currentNetwork].name}
-                      </Text>
-                    )}
-                  </Group>
-                  {metamaskInstalled && (
-                    <ConnectWallet
-                      currentAccount={currentAccount}
-                      setCurrentAccount={setCurrentAccount}
-                      setCurrentNetwork={setCurrentNetwork}
-                    />
-                  )}
-                </Group>
-              </Header>
-            }
-            navbar={
-              metamaskInstalled &&
-              currentNetwork &&
-              validNetwork && (
-                <Navbar width={{ base: 300 }}>
-                  <Navbar.Section>
-                    <SegmentedControl
-                      fullWidth
-                      orientation="vertical"
-                      styles={{
-                        root: { backgroundColor: "inherit" },
-                      }}
-                      size="md"
-                      data={[
-                        { value: "market", label: "Market" },
-                        { value: "myNfts", label: "My Arts" },
-                      ]}
-                      value={activeNav}
-                      onChange={setActiveNav}
-                    />
-                  </Navbar.Section>
-                  <Navbar.Section>
-                    <Group direction="column" grow={true}>
-                      <Button leftIcon={<HiOutlineCloudUpload />}>
-                        Mint an NFT
-                      </Button>
-                      <Button>Create Auction</Button>
-                    </Group>
-                  </Navbar.Section>
-                </Navbar>
-              )
-            }
-          >
-            <Container size="xl">
-              {metamaskInstalled ? (
-                currentAccount ? (
-                  validNetwork ? (
-                    mainContents[activeNav]
-                  ) : (
-                    <Center>
-                      <Text>
-                        Unsupported Network: Please change your network to
-                        Polygon or Mumbai
-                      </Text>
-                    </Center>
-                  )
-                ) : (
-                  <Center>
-                    <Text>Connect your wallet using Metamask</Text>
-                  </Center>
-                )
-              ) : (
-                <Center>
-                  <Text>Install Metamask to use this Web 3.0 app</Text>
-                </Center>
+    <AppShell
+      padding="md"
+      header={
+        <Header height={60} padding="xs">
+          <Group position="apart">
+            <Group>
+              <GiAtSea />
+              <Text weight="bold">ArtSea</Text>
+              {validNetwork && (
+                <Text
+                  color="dimmed"
+                  sx={{ fontFamily: theme.fontFamilyMonospace }}
+                >
+                  @{config.networks[currentNetwork].name}
+                </Text>
               )}
-            </Container>
-          </AppShell>
-        </ModalsProvider>
-      </NotificationsProvider>
-    </MantineProvider>
+            </Group>
+            {metamaskInstalled && (
+              <ConnectWallet
+                currentAccount={currentAccount}
+                setCurrentAccount={setCurrentAccount}
+                setCurrentNetwork={setCurrentNetwork}
+              />
+            )}
+          </Group>
+        </Header>
+      }
+      navbar={
+        metamaskInstalled &&
+        currentNetwork &&
+        validNetwork && (
+          <Navbar width={{ base: 300 }}>
+            <Navbar.Section>
+              <SegmentedControl
+                fullWidth
+                orientation="vertical"
+                styles={{
+                  root: { backgroundColor: "inherit" },
+                }}
+                size="md"
+                data={[
+                  { value: "market", label: "Market" },
+                  { value: "myNfts", label: "My Arts" },
+                ]}
+                value={activeNav}
+                onChange={setActiveNav}
+              />
+            </Navbar.Section>
+            <Navbar.Section>
+              <Group direction="column" grow={true}>
+                <MintNftButton
+                  buttonProps={{ leftIcon: <HiOutlineCloudUpload /> }}
+                >
+                  Mint an NFT
+                </MintNftButton>
+                <CreateAuctionButton>Create Auction</CreateAuctionButton>
+              </Group>
+            </Navbar.Section>
+          </Navbar>
+        )
+      }
+    >
+      <Container size="xl">
+        {metamaskInstalled ? (
+          currentAccount ? (
+            validNetwork ? (
+              mainContents[activeNav]
+            ) : (
+              <Center>
+                <Text>
+                  Unsupported Network: Please change your network to Polygon or
+                  Mumbai
+                </Text>
+              </Center>
+            )
+          ) : (
+            <Center>
+              <Text>Connect your wallet using Metamask</Text>
+            </Center>
+          )
+        ) : (
+          <Center>
+            <Text>Install Metamask to use this Web 3.0 app</Text>
+          </Center>
+        )}
+      </Container>
+    </AppShell>
   );
 }
