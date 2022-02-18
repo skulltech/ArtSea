@@ -1,8 +1,8 @@
 import { Button, Group, NumberInput } from "@mantine/core";
 import { useForm } from "@mantine/hooks";
 import { parseEther } from "ethers/lib/utils";
-import { getContract } from "../../utils/utils";
-import config from "../../utils/config";
+import config from "../utils/config";
+import { getContract } from "../utils/utils";
 
 export const CreateAuctionForm = ({
   currentAccount,

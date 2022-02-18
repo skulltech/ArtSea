@@ -2,8 +2,8 @@ import { Button, LoadingOverlay } from "@mantine/core";
 import { useModals } from "@mantine/modals";
 import { useState } from "react";
 import config from "../../utils/config";
+import { CreateAuctionForm } from "../CreateAuctionForm";
 import { InfoCard } from "../InfoCard";
-import { CreateAuctionForm } from "./CreateAuctionForm";
 
 export const NftCard = ({ nftDetails, currentAccount, currentNetwork }) => {
   const [transacting, setTransacting] = useState(false);

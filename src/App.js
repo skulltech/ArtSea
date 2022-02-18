@@ -1,27 +1,22 @@
 import { useState, useEffect } from "react";
 import { ConnectWallet } from "./components/ConnectWallet";
-import { MintNft } from "./components/MintNft";
 import {
   AppShell,
   Header,
   Group,
   Text,
   MantineProvider,
-  Tabs,
   Container,
   Center,
   useMantineTheme,
   Navbar,
   SegmentedControl,
 } from "@mantine/core";
-import { HiOutlineCloudUpload } from "react-icons/hi";
 import { GiAtSea } from "react-icons/gi";
-import { BsListUl } from "react-icons/bs";
-import { AiOutlineShopping } from "react-icons/ai";
 import { NotificationsProvider } from "@mantine/notifications";
 import { ModalsProvider } from "@mantine/modals";
 import { ListNfts } from "./components/listNfts/ListNfts";
-import { ListAuctions } from "./components/buyNfts/ListAuctions";
+import { ListAuctions } from "./components/listAuctions/ListAuctions";
 import config from "./utils/config";
 import { getContract } from "./utils/utils";
 
