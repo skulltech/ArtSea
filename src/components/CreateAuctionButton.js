@@ -50,7 +50,6 @@ const CreateAuctionForm = ({
   });
 
   const handleFormSubmit = async (formValues) => {
-    console.log("formValues:", formValues);
     const notificationId = notifications.showNotification({
       loading: true,
       title: "Creating Auction",

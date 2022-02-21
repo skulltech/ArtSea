@@ -12,13 +12,11 @@ export const ConnectWallet = ({
   const connectAccount = async () => {
     const { ethereum } = window;
     if (!ethereum) {
-      console.log("Metamask is not installed");
       return null;
     }
     const accounts = await ethereum.request({
       method: "eth_requestAccounts",
     });
-    console.log("Authorized account:", accounts[0]);
     return { account: accounts[0], network: parseInt(ethereum.networkVersion) };
   };
 

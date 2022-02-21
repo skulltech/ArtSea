@@ -54,144 +54,40 @@ export default function App() {
     ),
   };
 
-  const checkIfWalletIsConnected = async () => {
-    const { ethereum } = window;
-    if (ethereum) {
-      setMetamaskInstalled(true);
-    } else {
-      setMetamaskInstalled(false);
-      return false;
-    }
-    const accounts = await ethereum.request({ method: "eth_accounts" });
-    if (!accounts.length) {
-      console.log("No authorized accounts found");
-      return false;
-    }
-    console.log("Authorized account found:", accounts[0]);
-    setCurrentAccount(accounts[0]);
-    setCurrentNetwork(ethereum.networkVersion);
-    return true;
-  };
-
+  // Checks if wallet is connected on first render, and sets relevant states
   useEffect(() => {
+    const checkIfWalletIsConnected = async () => {
+      const { ethereum } = window;
+      if (ethereum) {
+        setMetamaskInstalled(true);
+      } else {
+        setMetamaskInstalled(false);
+        return false;
+      }
+      const accounts = await ethereum.request({ method: "eth_accounts" });
+      if (!accounts.length) {
+        return false;
+      }
+      setCurrentAccount(accounts[0]);
+      setCurrentNetwork(ethereum.networkVersion);
+      return true;
+    };
+
     checkIfWalletIsConnected();
   }, []);
 
-  useEffect(() => {
-    if (window.ethereum) {
-      window.ethereum.on("chainChanged", () => {
-        window.location.reload();
-      });
-      window.ethereum.on("accountsChanged", () => {
-        window.location.reload();
-      });
-    }
-  });
-
-  const loadAuctions = useCallback(
-    async (auctionIds) => {
-      const marketContract = getContract({
-        currentAccount,
-        contractInfo: config.contracts.marketContract,
-      });
-
-      const bidPlacedEvents = await marketContract.queryFilter(
-        marketContract.filters.BidPlaced()
-      );
-
-      await Promise.all(
-        auctionIds.map(async (auctionId) => {
-          const auctionInfo = await marketContract.auctions(auctionId);
-          const bidders = bidPlacedEvents
-            .filter((value) => value.args.auctionId === auctionId)
-            .map((event) => event.args.bidder);
-          const nftContract = getContract({
-            currentAccount,
-            contractInfo: {
-              contractAbi: ERC721MetadataAbi,
-              contractAddress: auctionInfo.tokenAddress,
-            },
-          });
-          const nftMetadataURI = await nftContract.tokenURI(
-            auctionInfo.tokenId
-          );
-          let nftMetadata;
-          try {
-            nftMetadata = await fetchJson(ipfsToHttp(nftMetadataURI));
-          } catch (error) {
-            console.log(error);
-          }
-          const nftCollectionName = await nftContract.name();
-          const auctionDetails = {
-            ...auctionInfo,
-            auctionId,
-            bidders,
-            nftMetadataURI,
-            nftMetadata,
-            nftCollectionName,
-            loading: false,
-          };
-          setAllAuctions((allAuctions) =>
-            allAuctions.set(auctionId, auctionDetails)
-          );
-        })
-      );
-    },
-    [currentAccount]
-  );
-
-  useEffect(() => {
-    const fetchAuctions = async (loadAuctions) => {
-      const marketContract = getContract({
-        currentAccount,
-        contractInfo: config.contracts.marketContract,
-      });
-      const auctionIds = (await marketContract.liveAuctionIds()).map((value) =>
-        value.toNumber()
-      );
-      const auctionsMap = auctionIds.reduce(
-        (previousValue, currentValue) =>
-          previousValue.set(currentValue, {
-            auctionId: currentValue,
-            loading: true,
-          }),
-        new OrderedMap()
-      );
-      setAllAuctions(auctionsMap);
-      await loadAuctions(auctionIds);
-    };
-
-    fetchAuctions(loadAuctions);
-  }, [currentAccount, setAllAuctions, loadAuctions]);
-
-  useEffect(() => {
-    const fetchNfts = async () => {
+  // Callback function that updates NFTs to latest information
+  const loadNfts = useCallback(
+    async (nftIds) => {
       const nftContract = getContract({
         currentAccount,
         contractInfo: config.contracts.nftContract,
       });
+
       const marketContract = getContract({
         currentAccount,
         contractInfo: config.contracts.marketContract,
       });
-      const collectionName = await nftContract.name();
-      const balance = (await nftContract.balanceOf(currentAccount)).toNumber();
-      const nftIds = await Promise.all(
-        [...Array(balance).keys()].map(
-          async (index) =>
-            await nftContract.tokenOfOwnerByIndex(currentAccount, index)
-        )
-      );
-      const nftsMap = nftIds.reduce(
-        (previousValue, currentValue) =>
-          previousValue.set(currentValue, {
-            tokenId: currentValue,
-            loading: true,
-            collectionName,
-          }),
-        new OrderedMap()
-      );
-      setAllNfts(nftsMap);
 
       await Promise.all(
         nftIds.map(async (tokenId) => {
@@ -233,54 +129,231 @@ export default function App() {
           );
         })
       );
+    },
+    [currentAccount]
+  );
+
+  // Callback function that updates auctions to latest information
+  const loadAuctions = useCallback(
+    async (auctionIds) => {
+      const marketContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.marketContract,
+      });
+
+      const bidPlacedEvents = await marketContract.queryFilter(
+        marketContract.filters.BidPlaced()
+      );
+
+      await Promise.all(
+        auctionIds.map(async (auctionId) => {
+          const auctionInfo = await marketContract.auctions(auctionId);
+          const bidders = bidPlacedEvents
+            .filter((value) => value.args.auctionId === auctionId)
+            .map((event) => event.args.bidder);
+          const nftContract = getContract({
+            currentAccount,
+            contractInfo: {
+              contractAbi: ERC721MetadataAbi,
+              contractAddress: auctionInfo.tokenAddress,
+            },
+          });
+          const nftMetadataURI = await nftContract.tokenURI(
+            auctionInfo.tokenId
+          );
+          const nftCollectionName = await nftContract.name();
+          const auctionDetails = {
+            ...auctionInfo,
+            auctionId,
+            bidders,
+            nftMetadataURI,
+            nftCollectionName,
+            loading: false,
+          };
+          setAllAuctions((allAuctions) =>
+            allAuctions.set(auctionId, auctionDetails)
+          );
+        })
+      );
+
+      await Promise.all(
+        auctionIds.map(async (auctionId) => {
+          const auctionInfo = await marketContract.auctions(auctionId);
+          const nftContract = getContract({
+            currentAccount,
+            contractInfo: {
+              contractAbi: ERC721MetadataAbi,
+              contractAddress: auctionInfo.tokenAddress,
+            },
+          });
+          const nftMetadataURI = await nftContract.tokenURI(
+            auctionInfo.tokenId
+          );
+          let nftMetadata;
+          try {
+            nftMetadata = await fetchJson(ipfsToHttp(nftMetadataURI));
+          } catch (error) {
+            console.log(error);
+          }
+          setAllAuctions((allAuctions) =>
+            allAuctions.set(auctionId, {
+              ...allAuctions.get(auctionId),
+              nftMetadata,
+            })
+          );
+        })
+      );
+    },
+    [currentAccount]
+  );
+
+  // Fetches list of live auctions
+  useEffect(() => {
+    const fetchAuctions = async () => {
+      const marketContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.marketContract,
+      });
+      const auctionIds = (await marketContract.liveAuctionIds()).map((value) =>
+        value.toNumber()
+      );
+      const auctionsMap = auctionIds.reduce(
+        (previousValue, currentValue) =>
+          previousValue.set(currentValue, {
+            auctionId: currentValue,
+            loading: true,
+          }),
+        new OrderedMap()
+      );
+      setAllAuctions(auctionsMap);
+      await loadAuctions(auctionIds);
     };
 
-    fetchNfts();
-  }, [currentAccount, setAllNfts]);
+    if (currentAccount && validNetwork) {
+      fetchAuctions();
+    }
+  }, [currentAccount, setAllAuctions, loadAuctions, validNetwork]);
 
+  // Fetches list of user's NFTs
   useEffect(() => {
-    const marketContract = getContract({
-      currentAccount,
-      contractInfo: config.contracts.marketContract,
-    });
-    marketContract.on("AuctionFinalized", async (auctionId, sold) => {
-      console.log("AuctionFinalized event:", { auctionId, sold });
-      const auctionIdParsed = await auctionId.toNumber();
-      setAllAuctions((allAuctions) => allAuctions.delete(auctionIdParsed));
-    });
-  });
+    const fetchNfts = async () => {
+      const nftContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.nftContract,
+      });
+      const collectionName = await nftContract.name();
+      const balance = (await nftContract.balanceOf(currentAccount)).toNumber();
+      const nftIds = await Promise.all(
+        [...Array(balance).keys()].map(
+          async (index) =>
+            await nftContract.tokenOfOwnerByIndex(currentAccount, index)
+        )
+      );
+      const nftsMap = nftIds.reduce(
+        (previousValue, currentValue) =>
+          previousValue.set(currentValue, {
+            tokenId: currentValue,
+            loading: true,
+            collectionName,
+          }),
+        new OrderedMap()
+      );
+      setAllNfts(nftsMap);
+      await loadNfts(nftIds);
+    };
 
+    if (currentAccount && validNetwork) {
+      fetchNfts();
+    }
+  }, [currentAccount, setAllNfts, validNetwork, loadNfts]);
+
+  // Setting up event listeners
   useEffect(() => {
-    const marketContract = getContract({
-      currentAccount,
-      contractInfo: config.contracts.marketContract,
-    });
-    marketContract.on(
-      "AuctionCreated",
-      async (auctionId, tokenAddress, tokenId, minBidAmount) => {
-        console.log("AuctionCreated event:", {
-          auctionId,
-          tokenAddress,
-          tokenId,
-          minBidAmount,
-        });
+    // Reload page on Metamask's account and chain change
+    if (window.ethereum) {
+      window.ethereum.on("chainChanged", () => {
+        window.location.reload();
+      });
+      window.ethereum.on("accountsChanged", () => {
+        window.location.reload();
+      });
+    }
+
+    // Listening to smart contract events
+    if (currentAccount && validNetwork) {
+      const marketContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.marketContract,
+      });
+      const nftContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.nftContract,
+      });
+
+      marketContract.on("AuctionFinalized", async (auctionId, sold) => {
+        console.log("AuctionFinalized event:", { auctionId, sold });
         const auctionIdParsed = await auctionId.toNumber();
-        setAllAuctions((allAuctions) => allAuctions.set(auctionIdParsed));
-        await loadAuctions([auctionIdParsed]);
-      }
-    );
-  });
+        setAllAuctions((allAuctions) => allAuctions.delete(auctionIdParsed));
+        if (!sold) {
+          const auctionInfo = await marketContract.auctions(auctionIdParsed);
+          setAllNfts((allNfts) =>
+            allNfts.set(auctionInfo.tokenId, {
+              ...allNfts.get(auctionInfo.tokenId),
+              tokenIsForSale: false,
+            })
+          );
+        }
+      });
 
-  useEffect(() => {
-    const marketContract = getContract({
-      currentAccount,
-      contractInfo: config.contracts.marketContract,
-    });
-    marketContract.on("BidPlaced", async (auctionId, bidder, bidAmount) => {
-      console.log("BidPlaced event:", auctionId, bidder, bidAmount);
-      const auctionIdParsed = await auctionId.toNumber();
-      await loadAuctions([auctionIdParsed]);
-    });
+      marketContract.on(
+        "AuctionCreated",
+        async (auctionId, tokenAddress, tokenId, minBidAmount) => {
+          console.log("AuctionCreated event:", {
+            auctionId,
+            tokenAddress,
+            tokenId,
+            minBidAmount,
+          });
+          const auctionIdParsed = await auctionId.toNumber();
+          setAllAuctions((allAuctions) =>
+            allAuctions.set(auctionIdParsed, {
+              auctionId: auctionIdParsed,
+              loading: true,
+            })
+          );
+          setAllNfts((allNfts) =>
+            allNfts.set(tokenId, {
+              ...allNfts.get(tokenId),
+              tokenIsForSale: true,
+            })
+          );
+          await loadAuctions([auctionIdParsed]);
+        }
+      );
+
+      marketContract.on("BidPlaced", async (auctionId, bidder, bidAmount) => {
+        console.log("BidPlaced event:", { auctionId, bidder, bidAmount });
+        const auctionIdParsed = await auctionId.toNumber();
+        await loadAuctions([auctionIdParsed]);
+      });
+
+      nftContract.on("Transfer", async (from, to, tokenId) => {
+        console.log("Transfer event:", { from, to, tokenId });
+        if (from === currentAccount) {
+          setAllNfts((allNfts) => allNfts.delete(tokenId));
+        }
+        if (to === currentAccount) {
+          const collectionName = await nftContract.name();
+          setAllNfts(async (allNfts) =>
+            allNfts.set(tokenId, {
+              tokenId,
+              loading: true,
+              collectionName,
+            })
+          );
+        }
+      });
+    }
   });
 
   return (
@@ -335,6 +408,7 @@ export default function App() {
             <Navbar.Section>
               <Group direction="column" grow={true}>
                 <MintNftButton
+                  currentAccount={currentAccount}
                   buttonProps={{ leftIcon: <HiOutlineCloudUpload /> }}
                 >
                   Mint an NFT

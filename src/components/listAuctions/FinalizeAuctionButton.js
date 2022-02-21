@@ -46,7 +46,7 @@ const FinalizeAuctionButton = ({
           config.contracts.marketContract.contractAddress,
           tokenId
         );
-        console.log("Transaction hash for approve:", txn.hash);
+        console.log("Transaction hash for NFT transfer approve:", txn.hash);
         receipt = await txn.wait();
         console.log("Transaction receipt:", receipt);
       }
@@ -55,8 +55,9 @@ const FinalizeAuctionButton = ({
         contractInfo: config.contracts.marketContract,
       });
       txn = await marketContract.finalizeAuction(auctionId, ifSell);
+      console.log("Transaction hash for finalizing auction:", txn.hash);
       receipt = await txn.wait();
-      console.log("Receipt: ", receipt);
+      console.log("Transaction receipt: ", receipt);
 
       notifications.updateNotification(notificationId, {
         notificationId,

@@ -5,7 +5,6 @@ import config from "./config";
 export const getContract = ({ currentAccount, contractInfo }) => {
   const { ethereum } = window;
   if (!ethereum) {
-    console.log("Ethereum object not found");
     return null;
   }
   const provider = new ethers.providers.Web3Provider(ethereum);

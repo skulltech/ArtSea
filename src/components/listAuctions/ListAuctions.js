@@ -30,10 +30,6 @@ export const ListAuctions = ({
   ];
 
   useEffect(() => {
-    console.log(allAuctions);
-  }, [allAuctions]);
-
-  useEffect(() => {
     const creatorFilterFuncs = {
       all: (auction) => true,
       me: (auction) => auction.ownerAddress.toLowerCase() === currentAccount,

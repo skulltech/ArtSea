@@ -24,7 +24,7 @@ const mintNft = async ({ currentAccount, image, name, description }) => {
     contractInfo: config.contracts.nftContract,
   });
   let txn = await nftContract.safeMint(currentAccount, metadata.url);
-  console.log("Transaction hash for minting the NFT:", txn.hash);
+  console.log("Transaction hash for minting NFT:", txn.hash);
   const receipt = await txn.wait();
   console.log("Transaction receipt:", receipt);
   const transferEvent = receipt.events?.filter((x) => {
