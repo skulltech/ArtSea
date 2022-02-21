@@ -1,5 +1,6 @@
 import { Text } from "@mantine/core";
 import { formatEther } from "ethers/lib/utils";
+import { minifyAddress } from "../../utils/utils";
 import { InfoCard } from "../InfoCard";
 import {
   CancelAuctionButton,
@@ -44,7 +45,9 @@ export const AuctionCard = ({
         ) : (
           <Text>
             Current highest bid is of {highestBidAmount} $MATIC by{" "}
-            {currentAccount === highestBidder ? "you" : highestBidder}:
+            {currentAccount === highestBidder
+              ? "you"
+              : minifyAddress(highestBidder)}
           </Text>
         )}
         {auctionCreator === currentAccount ? (
@@ -70,7 +73,9 @@ export const AuctionCard = ({
           <PlaceBidButton
             currentAccount={currentAccount}
             auctionId={auctionDetails.auctionId}
-          ></PlaceBidButton>
+          >
+            Place Bid
+          </PlaceBidButton>
         )}
       </InfoCard>
     </>

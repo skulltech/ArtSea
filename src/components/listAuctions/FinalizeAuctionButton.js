@@ -7,6 +7,41 @@ import { BsFillCheckCircleFill } from "react-icons/bs";
 import { IoAlertCircleSharp } from "react-icons/io5";
 import { Button } from "@mantine/core";
 
+const finalizeAuction = async ({
+  currentAccount,
+  ifSell,
+  auctionId,
+  tokenAddress,
+  tokenId,
+}) => {
+  let txn, receipt;
+
+  if (ifSell) {
+    const nftContract = getContract({
+      currentAccount,
+      contractInfo: {
+        contractAbi: ERC721Abi,
+        contractAddress: tokenAddress,
+      },
+    });
+    txn = await nftContract.approve(
+      config.contracts.marketContract.contractAddress,
+      tokenId
+    );
+    console.log("Transaction hash for NFT transfer approve:", txn.hash);
+    receipt = await txn.wait();
+    console.log("Transaction receipt:", receipt);
+  }
+  const marketContract = getContract({
+    currentAccount,
+    contractInfo: config.contracts.marketContract,
+  });
+  txn = await marketContract.finalizeAuction(auctionId, ifSell);
+  console.log("Transaction hash for finalizing auction:", txn.hash);
+  receipt = await txn.wait();
+  console.log("Transaction receipt: ", receipt);
+};
+
 const FinalizeAuctionButton = ({
   currentAccount,
   auctionId,
@@ -23,7 +58,7 @@ const FinalizeAuctionButton = ({
   const notifications = useNotifications();
   const modals = useModals();
 
-  const finalizeAuction = async () => {
+  const handleConfirm = async () => {
     const notificationId = notifications.showNotification({
       loading: true,
       autoClose: false,
@@ -32,32 +67,13 @@ const FinalizeAuctionButton = ({
     });
 
     try {
-      let txn, receipt;
-
-      if (ifSell) {
-        const nftContract = getContract({
-          currentAccount,
-          contractInfo: {
-            contractAbi: ERC721Abi,
-            contractAddress: tokenAddress,
-          },
-        });
-        txn = await nftContract.approve(
-          config.contracts.marketContract.contractAddress,
-          tokenId
-        );
-        console.log("Transaction hash for NFT transfer approve:", txn.hash);
-        receipt = await txn.wait();
-        console.log("Transaction receipt:", receipt);
-      }
-      const marketContract = getContract({
+      await finalizeAuction({
         currentAccount,
-        contractInfo: config.contracts.marketContract,
+        ifSell,
+        auctionId,
+        tokenAddress,
+        tokenId,
       });
-      txn = await marketContract.finalizeAuction(auctionId, ifSell);
-      console.log("Transaction hash for finalizing auction:", txn.hash);
-      receipt = await txn.wait();
-      console.log("Transaction receipt: ", receipt);
 
       notifications.updateNotification(notificationId, {
         notificationId,
@@ -83,7 +99,7 @@ const FinalizeAuctionButton = ({
 
   const openConfirmModal = () => {
     modals.openConfirmModal({
-      onConfirm: finalizeAuction,
+      onConfirm: handleConfirm,
       ...modalProps,
     });
   };

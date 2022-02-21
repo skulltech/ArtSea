@@ -3,49 +3,32 @@ import { useForm } from "@mantine/hooks";
 import { parseEther } from "ethers/lib/utils";
 import { getContract } from "../../utils/utils";
 import config from "../../utils/config";
-import { useEffect, useState } from "react";
 import { useNotifications } from "@mantine/notifications";
 import { useModals } from "@mantine/modals";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 import { IoAlertCircleSharp } from "react-icons/io5";
 
-const PlaceBidForm = ({ setFormValues }) => {
+const placeBid = async ({ currentAccount, auctionId, bidAmount }) => {
+  const marketContract = getContract({
+    currentAccount,
+    contractInfo: config.contracts.marketContract,
+  });
+  const options = { value: parseEther(bidAmount.toString()) };
+  const txn = await marketContract.placeBid(auctionId, options);
+  console.log("Transaction hash for placing bid:", txn.hash);
+  const receipt = await txn.wait();
+  console.log("Transaction receipt:", receipt);
+};
+
+const PlaceBidForm = ({ currentAccount, auctionId, closeModal }) => {
+  const notifications = useNotifications();
   const form = useForm({
     initialValues: {
       bidAmount: 0,
     },
   });
 
-  useEffect(() => {
-    setFormValues(form.values);
-  }, [form.values, setFormValues]);
-
-  return (
-    <form>
-      <Group direction="column" grow="true">
-        <NumberInput
-          placeholder="Bid amount in $MATIC"
-          label="Bid amount in $MATIC"
-          required
-          precision={18}
-          {...form.getInputProps("bidAmount")}
-        />
-      </Group>
-    </form>
-  );
-};
-
-export const PlaceBidButton = ({
-  currentAccount,
-  auctionId,
-  buttonProps,
-  children,
-}) => {
-  const [formValues, setFormValues] = useState(null);
-  const notifications = useNotifications();
-  const modals = useModals();
-
-  const placeBid = async (formValues) => {
+  const handleFormSubmit = async (formValues) => {
     const notificationId = notifications.showNotification({
       loading: true,
       title: "Placing Bid",
@@ -56,15 +39,11 @@ export const PlaceBidButton = ({
     });
 
     try {
-      const marketContract = getContract({
+      await placeBid({
         currentAccount,
-        contractInfo: config.contracts.marketContract,
+        auctionId,
+        bidAmount: formValues.bidAmount,
       });
-      const options = { value: parseEther(formValues.bidAmount.toString()) };
-      const txn = await marketContract.placeBid(auctionId, options);
-      console.log("Transaction hash for placing bid:", txn.hash);
-      const receipt = await txn.wait();
-      console.log("Transaction receipt:", receipt);
 
       notifications.updateNotification(notificationId, {
         notificationId,
@@ -90,11 +69,50 @@ export const PlaceBidButton = ({
     }
   };
 
+  return (
+    <form
+      onSubmit={form.onSubmit((formValues) => {
+        closeModal();
+        handleFormSubmit(formValues);
+      })}
+    >
+      <Group direction="column" grow="true">
+        <NumberInput
+          placeholder="Bid amount in $MATIC"
+          label="Bid amount in $MATIC"
+          required
+          precision={18}
+          {...form.getInputProps("bidAmount")}
+        />
+      </Group>
+      <Group position="right">
+        <Button onClick={closeModal} variant="default">
+          Cancel
+        </Button>
+        <Button type="submit">Confirm</Button>
+      </Group>
+    </form>
+  );
+};
+
+export const PlaceBidButton = ({
+  currentAccount,
+  auctionId,
+  buttonProps,
+  children,
+}) => {
+  const modals = useModals();
+
   const openPlaceBidModal = () => {
-    modals.openConfirmModal({
+    const modalId = modals.openModal({
       title: "Place Bid",
-      children: <PlaceBidForm setFormValues={setFormValues} />,
-      onConfirm: () => placeBid(formValues),
+      children: (
+        <PlaceBidForm
+          currentAccount={currentAccount}
+          auctionId={auctionId}
+          closeModal={() => modals.closeModal(modalId)}
+        />
+      ),
     });
   };
 
