@@ -21,16 +21,15 @@ import ERC721MetadataAbi from "@solidstate/abi/ERC721Metadata.json";
 import { fetchJson } from "ethers/lib/utils";
 import { MintNftButton } from "./components/MintNftButton";
 import { CreateAuctionButton } from "./components/CreateAuctionButton";
+import { OrderedMap } from "immutable";
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
   const [currentNetwork, setCurrentNetwork] = useState(null);
   const [metamaskInstalled, setMetamaskInstalled] = useState(false);
   const [activeNav, setActiveNav] = useState("market");
-  const [allNfts, setAllNfts] = useState([]);
-  const [allAuctions, setAllAuctions] = useState([]);
-  const [fetchingAuctions, setFetchingAuctions] = useState(false);
-  const [fetchingNfts, setFetchingNfts] = useState(false);
+  const [allNfts, setAllNfts] = useState(new OrderedMap());
+  const [allAuctions, setAllAuctions] = useState(new OrderedMap());
 
   const theme = useMantineTheme();
 
@@ -41,7 +40,7 @@ export default function App() {
       <ListAuctions
         currentAccount={currentAccount}
         currentNetwork={currentNetwork}
-        allAuctions={allAuctions}
+        allAuctions={[...allAuctions.values()]}
         setAllAuctions={setAllAuctions}
       />
     ),
@@ -49,7 +48,7 @@ export default function App() {
       <ListNfts
         currentAccount={currentAccount}
         currentNetwork={currentNetwork}
-        allNfts={allNfts}
+        allNfts={[...allNfts.values()]}
         setAllNfts={setAllNfts}
       />
     ),
@@ -79,6 +78,10 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    console.log(allNfts);
+  }, [allNfts]);
+
+  useEffect(() => {
     if (window.ethereum) {
       window.ethereum.on("chainChanged", () => {
         window.location.reload();
@@ -91,57 +94,63 @@ export default function App() {
 
   useEffect(() => {
     const fetchAuctions = async () => {
-      setFetchingAuctions(true);
+      const marketContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.marketContract,
+      });
+      const bidPlacedEvents = await marketContract.queryFilter(
+        marketContract.filters.BidPlaced()
+      );
+      const auctionIds = (await marketContract.liveAuctionIds()).map((value) =>
+        value.toNumber()
+      );
+      const auctionsMap = auctionIds.reduce(
+        (previousValue, currentValue) =>
+          previousValue.set(currentValue, {
+            auctionId: currentValue,
+            loading: true,
+          }),
+        new OrderedMap()
+      );
+      setAllAuctions(auctionsMap);
 
-      try {
-        const marketContract = getContract({
-          currentAccount,
-          contractInfo: config.contracts.marketContract,
-        });
-        const bidPlacedEvents = await marketContract.queryFilter(
-          marketContract.filters.BidPlaced()
-        );
-        const auctionIds = await marketContract.liveAuctionIds();
-        const auctions = await Promise.all(
-          auctionIds.map(async (auctionId) => {
-            const auctionInfo = await marketContract.auctions(auctionId);
-            const bidders = bidPlacedEvents
-              .filter((value) => value.args.auctionId === auctionId)
-              .map((event) => event.args.bidder);
-            const nftContract = getContract({
-              currentAccount,
-              contractInfo: {
-                contractAbi: ERC721MetadataAbi,
-                contractAddress: auctionInfo.tokenAddress,
-              },
-            });
-            const nftMetadataURI = await nftContract.tokenURI(
-              auctionInfo.tokenId
-            );
-            let nftMetadata;
-            try {
-              nftMetadata = await fetchJson(ipfsToHttp(nftMetadataURI));
-            } catch (error) {
-              console.log(error);
-            }
-            const nftCollectionName = await nftContract.name();
-            return {
-              ...auctionInfo,
-              auctionId,
-              bidders,
-              nftMetadataURI,
-              nftMetadata,
-              nftCollectionName,
-            };
-          })
-        );
-        console.log(auctions);
-        setAllAuctions(auctions);
-      } catch (error) {
-        console.log(error);
-      }
-
-      setFetchingAuctions(false);
+      await Promise.all(
+        auctionIds.map(async (auctionId) => {
+          const auctionInfo = await marketContract.auctions(auctionId);
+          const bidders = bidPlacedEvents
+            .filter((value) => value.args.auctionId === auctionId)
+            .map((event) => event.args.bidder);
+          const nftContract = getContract({
+            currentAccount,
+            contractInfo: {
+              contractAbi: ERC721MetadataAbi,
+              contractAddress: auctionInfo.tokenAddress,
+            },
+          });
+          const nftMetadataURI = await nftContract.tokenURI(
+            auctionInfo.tokenId
+          );
+          let nftMetadata;
+          try {
+            nftMetadata = await fetchJson(ipfsToHttp(nftMetadataURI));
+          } catch (error) {
+            console.log(error);
+          }
+          const nftCollectionName = await nftContract.name();
+          const auctionDetails = {
+            ...auctionInfo,
+            auctionId,
+            bidders,
+            nftMetadataURI,
+            nftMetadata,
+            nftCollectionName,
+            loading: false,
+          };
+          setAllAuctions((allAuctions) =>
+            allAuctions.set(auctionId, auctionDetails)
+          );
+        })
+      );
     };
 
     fetchAuctions();
@@ -149,8 +158,6 @@ export default function App() {
 
   useEffect(() => {
     const fetchNfts = async () => {
-      setFetchingNfts(true);
-
       const nftContract = getContract({
         currentAccount,
         contractInfo: config.contracts.nftContract,
@@ -161,18 +168,29 @@ export default function App() {
       });
       const collectionName = await nftContract.name();
       const balance = (await nftContract.balanceOf(currentAccount)).toNumber();
-      const nftsOwned = await Promise.all(
-        [...Array(balance).keys()].map(async (index) => {
-          const tokenId = await nftContract.tokenOfOwnerByIndex(
-            currentAccount,
-            index
-          );
+      const nftIds = await Promise.all(
+        [...Array(balance).keys()].map(
+          async (index) =>
+            await nftContract.tokenOfOwnerByIndex(currentAccount, index)
+        )
+      );
+      const nftsMap = nftIds.reduce(
+        (previousValue, currentValue) =>
+          previousValue.set(currentValue, {
+            nftId: currentValue,
+            loading: true,
+          }),
+        new OrderedMap()
+      );
+      setAllNfts(nftsMap);
+
+      await Promise.all(
+        nftIds.map(async (tokenId) => {
           const tokenURI = await nftContract.tokenURI(tokenId);
           let tokenMetadata;
           try {
             tokenMetadata = await fetchJson({
               url: ipfsToHttp(tokenURI),
-              timeout: 3 * 1000,
             });
           } catch (error) {
             console.log(error);
@@ -181,19 +199,17 @@ export default function App() {
             config.contracts.nftContract.contractAddress,
             tokenId
           );
-          return {
+          const nftDetails = {
             collectionName,
             tokenId,
             tokenURI,
             tokenMetadata,
             tokenIsForSale: forSale,
+            loading: false,
           };
+          setAllNfts((allNfts) => allNfts.set(tokenId, nftDetails));
         })
       );
-      console.log(nftsOwned);
-      setAllNfts(nftsOwned);
-
-      setFetchingNfts(false);
     };
 
     fetchNfts();

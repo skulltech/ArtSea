@@ -1,4 +1,10 @@
-import { Divider, Group, NativeSelect, SimpleGrid } from "@mantine/core";
+import {
+  Divider,
+  Group,
+  NativeSelect,
+  SimpleGrid,
+  Skeleton,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 import { AuctionCard } from "./AuctionCard";
 
@@ -22,6 +28,10 @@ export const ListAuctions = ({
     { value: "others", label: "Bid on by others" },
     { value: "all", label: "All" },
   ];
+
+  useEffect(() => {
+    console.log(allAuctions);
+  }, [allAuctions]);
 
   useEffect(() => {
     const creatorFilterFuncs = {
@@ -69,14 +79,18 @@ export const ListAuctions = ({
       </Group>
       <Divider />
       <SimpleGrid cols={2}>
-        {auctionsToShow.map((auction) => (
-          <AuctionCard
-            auctionDetails={auction}
-            key={auction.auctionId}
-            currentAccount={currentAccount}
-            currentNetwork={currentNetwork}
-          />
-        ))}
+        {auctionsToShow.map((auction) =>
+          auction.loading ? (
+            <Skeleton key={auction.auctionId} />
+          ) : (
+            <AuctionCard
+              auctionDetails={auction}
+              key={auction.auctionId}
+              currentAccount={currentAccount}
+              currentNetwork={currentNetwork}
+            />
+          )
+        )}
       </SimpleGrid>
     </Group>
   );

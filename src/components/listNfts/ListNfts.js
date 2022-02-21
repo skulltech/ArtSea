@@ -1,4 +1,10 @@
-import { Divider, Group, NativeSelect, SimpleGrid } from "@mantine/core";
+import {
+  Divider,
+  Group,
+  NativeSelect,
+  SimpleGrid,
+  Skeleton,
+} from "@mantine/core";
 import { useEffect, useState } from "react";
 import { NftCard } from "./NftCard";
 
@@ -41,14 +47,18 @@ export const ListNfts = ({ currentAccount, currentNetwork, allNfts }) => {
           { maxWidth: "xs", cols: 1 },
         ]}
       >
-        {nftsToShow.map((nft) => (
-          <NftCard
-            nftDetails={nft}
-            key={nft.tokenId}
-            currentNetwork={currentNetwork}
-            currentAccount={currentAccount}
-          />
-        ))}
+        {nftsToShow.map((nft) =>
+          nft.loading ? (
+            <Skeleton key={nft.tokenId} />
+          ) : (
+            <NftCard
+              nftDetails={nft}
+              key={nft.tokenId}
+              currentNetwork={currentNetwork}
+              currentAccount={currentAccount}
+            />
+          )
+        )}
       </SimpleGrid>
     </Group>
   );
