@@ -10,7 +10,6 @@ import {
   useMantineTheme,
   Navbar,
   SegmentedControl,
-  Button,
 } from "@mantine/core";
 import { GiAtSea } from "react-icons/gi";
 import { ListNfts } from "./components/listNfts/ListNfts";
@@ -21,7 +20,6 @@ import { HiOutlineCloudUpload } from "react-icons/hi";
 import ERC721MetadataAbi from "@solidstate/abi/ERC721Metadata.json";
 import { fetchJson } from "ethers/lib/utils";
 import { MintNftButton } from "./components/MintNftButton";
-import { useModals } from "@mantine/modals";
 import { CreateAuctionButton } from "./components/CreateAuctionButton";
 
 export default function App() {
@@ -206,7 +204,38 @@ export default function App() {
       currentAccount,
       contractInfo: config.contracts.marketContract,
     });
-    marketContract.on("AuctionFinalized", () => {});
+    marketContract.on("AuctionFinalized", (auctionId, sold) => {
+      console.log("AuctionFinalized event:", auctionId, sold);
+    });
+  });
+
+  useEffect(() => {
+    const marketContract = getContract({
+      currentAccount,
+      contractInfo: config.contracts.marketContract,
+    });
+    marketContract.on(
+      "AuctionCreated",
+      (auctionId, tokenAddress, tokenId, minBidAmount) => {
+        console.log(
+          "AuctionCreated event:",
+          auctionId,
+          tokenAddress,
+          tokenId,
+          minBidAmount
+        );
+      }
+    );
+  });
+
+  useEffect(() => {
+    const marketContract = getContract({
+      currentAccount,
+      contractInfo: config.contracts.marketContract,
+    });
+    marketContract.on("BidPlaced", (auctionId, bidder, bidAmount) => {
+      console.log("BidPlaced event:", auctionId, bidder, bidAmount);
+    });
   });
 
   return (

@@ -1,6 +1,6 @@
 {
   "nftContractAddress": "0x852F7d80E87FEFCA5100E4F130A5f26cD381CD51",
-  "marketContractAddress": "0xd76d75C300a9b7dD7a796803EFed39bb7Fffa0ec",
+  "marketContractAddress": "0x77a5dEeebfaF0A3Dc0d63Cdc68Ca47342bCf4a66",
   "polygonOpenSeaUrl": "https://testnets.opensea.io/assets/matic/",
   "mumbaiOpenSeaUrl": "https://testnets.opensea.io/assets/mumbai/"
 }

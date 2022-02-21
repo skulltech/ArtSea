@@ -114,5 +114,7 @@ contract ArtSeaMarket {
         }
         auctionIsLive[auctionId] = false;
         tokenIsForSale[auction.tokenAddress][auction.tokenId] = false;
+
+        emit AuctionFinalized(auctionId, accept);
     }
 }

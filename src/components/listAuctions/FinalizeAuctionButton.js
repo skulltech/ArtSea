@@ -121,6 +121,10 @@ export const SellAuctionButton = ({
         title: "Sell successful",
         message: "Successfully sold the item to the highest bidder",
       }}
+      modalProps={{
+        title: "Sell auction",
+        message: "Do you wanna sell your item to the current highest bidder?",
+      }}
     >
       {children}
     </FinalizeAuctionButton>
@@ -140,7 +144,7 @@ export const CancelAuctionButton = ({
       auctionId={auctionId}
       tokenAddress={tokenAddress}
       tokenId={tokenId}
-      ifSell={true}
+      ifSell={false}
       progressNotificationProps={{
         title: "Deleting auction",
         message:
@@ -153,6 +157,10 @@ export const CancelAuctionButton = ({
       successNotificationProps={{
         title: "Delete successful",
         message: "Successfully cancelled your auction",
+      }}
+      modalProps={{
+        title: "Cancel auction",
+        message: "Do you wanna cancel your auction?",
       }}
     >
       {children}
