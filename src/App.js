@@ -27,7 +27,7 @@ export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
   const [currentNetwork, setCurrentNetwork] = useState(null);
   const [metamaskInstalled, setMetamaskInstalled] = useState(false);
-  const [activeNav, setActiveNav] = useState("market");
+  const [activeNav, setActiveNav] = useState("marketComponent");
   const [allNfts, setAllNfts] = useState(new OrderedMap());
   const [allAuctions, setAllAuctions] = useState(new OrderedMap());
 
@@ -36,7 +36,7 @@ export default function App() {
   const validNetwork = Object.keys(config.networks).includes(currentNetwork);
 
   const mainContents = {
-    market: (
+    marketComponent: (
       <ListAuctions
         currentAccount={currentAccount}
         currentNetwork={currentNetwork}
@@ -44,7 +44,7 @@ export default function App() {
         setAllAuctions={setAllAuctions}
       />
     ),
-    myNfts: (
+    nftsComponent: (
       <ListNfts
         currentAccount={currentAccount}
         currentNetwork={currentNetwork}
@@ -398,8 +398,8 @@ export default function App() {
                 }}
                 size="md"
                 data={[
-                  { value: "market", label: "Market" },
-                  { value: "myNfts", label: "My Arts" },
+                  { value: "marketComponent", label: "Market" },
+                  { value: "nftsComponent", label: "My Arts" },
                 ]}
                 value={activeNav}
                 onChange={setActiveNav}

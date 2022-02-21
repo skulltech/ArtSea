@@ -74,7 +74,14 @@ export const ListAuctions = ({
         </Group>
       </Group>
       <Divider />
-      <SimpleGrid cols={2}>
+      <SimpleGrid
+        cols={4}
+        breakpoints={[
+          { maxWidth: "lg", cols: 3 },
+          { maxWidth: "md", cols: 2 },
+          { maxWidth: "sm", cols: 1 },
+        ]}
+      >
         {auctionsToShow.map((auction) =>
           auction.loading ? (
             <Skeleton key={auction.auctionId} />

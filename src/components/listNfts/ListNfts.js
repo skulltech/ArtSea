@@ -43,8 +43,9 @@ export const ListNfts = ({ currentAccount, currentNetwork, allNfts }) => {
       <SimpleGrid
         cols={4}
         breakpoints={[
-          { maxWidth: "sm", cols: 2 },
-          { maxWidth: "xs", cols: 1 },
+          { maxWidth: "lg", cols: 3 },
+          { maxWidth: "md", cols: 2 },
+          { maxWidth: "sm", cols: 1 },
         ]}
       >
         {nftsToShow.map((nft) =>
