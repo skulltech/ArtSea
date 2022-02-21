@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ConnectWallet } from "./components/ConnectWallet";
 import {
   AppShell,
@@ -78,10 +78,6 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    console.log(allNfts);
-  }, [allNfts]);
-
-  useEffect(() => {
     if (window.ethereum) {
       window.ethereum.on("chainChanged", () => {
         window.location.reload();
@@ -92,27 +88,16 @@ export default function App() {
     }
   });
 
-  useEffect(() => {
-    const fetchAuctions = async () => {
+  const loadAuctions = useCallback(
+    async (auctionIds) => {
       const marketContract = getContract({
         currentAccount,
         contractInfo: config.contracts.marketContract,
       });
+
       const bidPlacedEvents = await marketContract.queryFilter(
         marketContract.filters.BidPlaced()
       );
-      const auctionIds = (await marketContract.liveAuctionIds()).map((value) =>
-        value.toNumber()
-      );
-      const auctionsMap = auctionIds.reduce(
-        (previousValue, currentValue) =>
-          previousValue.set(currentValue, {
-            auctionId: currentValue,
-            loading: true,
-          }),
-        new OrderedMap()
-      );
-      setAllAuctions(auctionsMap);
 
       await Promise.all(
         auctionIds.map(async (auctionId) => {
@@ -151,10 +136,33 @@ export default function App() {
           );
         })
       );
+    },
+    [currentAccount]
+  );
+
+  useEffect(() => {
+    const fetchAuctions = async (loadAuctions) => {
+      const marketContract = getContract({
+        currentAccount,
+        contractInfo: config.contracts.marketContract,
+      });
+      const auctionIds = (await marketContract.liveAuctionIds()).map((value) =>
+        value.toNumber()
+      );
+      const auctionsMap = auctionIds.reduce(
+        (previousValue, currentValue) =>
+          previousValue.set(currentValue, {
+            auctionId: currentValue,
+            loading: true,
+          }),
+        new OrderedMap()
+      );
+      setAllAuctions(auctionsMap);
+      await loadAuctions(auctionIds);
     };
 
-    fetchAuctions();
-  }, [currentAccount, setAllAuctions]);
+    fetchAuctions(loadAuctions);
+  }, [currentAccount, setAllAuctions, loadAuctions]);
 
   useEffect(() => {
     const fetchNfts = async () => {
@@ -235,8 +243,10 @@ export default function App() {
       currentAccount,
       contractInfo: config.contracts.marketContract,
     });
-    marketContract.on("AuctionFinalized", (auctionId, sold) => {
-      console.log("AuctionFinalized event:", auctionId, sold);
+    marketContract.on("AuctionFinalized", async (auctionId, sold) => {
+      console.log("AuctionFinalized event:", { auctionId, sold });
+      const auctionIdParsed = await auctionId.toNumber();
+      setAllAuctions((allAuctions) => allAuctions.delete(auctionIdParsed));
     });
   });
 
@@ -247,14 +257,16 @@ export default function App() {
     });
     marketContract.on(
       "AuctionCreated",
-      (auctionId, tokenAddress, tokenId, minBidAmount) => {
-        console.log(
-          "AuctionCreated event:",
+      async (auctionId, tokenAddress, tokenId, minBidAmount) => {
+        console.log("AuctionCreated event:", {
           auctionId,
           tokenAddress,
           tokenId,
-          minBidAmount
-        );
+          minBidAmount,
+        });
+        const auctionIdParsed = await auctionId.toNumber();
+        setAllAuctions((allAuctions) => allAuctions.set(auctionIdParsed));
+        await loadAuctions([auctionIdParsed]);
       }
     );
   });
@@ -264,8 +276,10 @@ export default function App() {
       currentAccount,
       contractInfo: config.contracts.marketContract,
     });
-    marketContract.on("BidPlaced", (auctionId, bidder, bidAmount) => {
+    marketContract.on("BidPlaced", async (auctionId, bidder, bidAmount) => {
       console.log("BidPlaced event:", auctionId, bidder, bidAmount);
+      const auctionIdParsed = await auctionId.toNumber();
+      await loadAuctions([auctionIdParsed]);
     });
   });
 
