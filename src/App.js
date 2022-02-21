@@ -177,12 +177,34 @@ export default function App() {
       const nftsMap = nftIds.reduce(
         (previousValue, currentValue) =>
           previousValue.set(currentValue, {
-            nftId: currentValue,
+            tokenId: currentValue,
             loading: true,
+            collectionName,
           }),
         new OrderedMap()
       );
       setAllNfts(nftsMap);
+
+      await Promise.all(
+        nftIds.map(async (tokenId) => {
+          const tokenURI = await nftContract.tokenURI(tokenId);
+          const forSale = await marketContract.tokenIsForSale(
+            config.contracts.nftContract.contractAddress,
+            tokenId
+          );
+          const additionalDetails = {
+            tokenURI,
+            tokenIsForSale: forSale,
+            loading: false,
+          };
+          setAllNfts((allNfts) =>
+            allNfts.set(tokenId, {
+              ...allNfts.get(tokenId),
+              ...additionalDetails,
+            })
+          );
+        })
+      );
 
       await Promise.all(
         nftIds.map(async (tokenId) => {
@@ -195,19 +217,12 @@ export default function App() {
           } catch (error) {
             console.log(error);
           }
-          const forSale = await marketContract.tokenIsForSale(
-            config.contracts.nftContract.contractAddress,
-            tokenId
+          setAllNfts((allNfts) =>
+            allNfts.set(tokenId, {
+              ...allNfts.get(tokenId),
+              tokenMetadata,
+            })
           );
-          const nftDetails = {
-            collectionName,
-            tokenId,
-            tokenURI,
-            tokenMetadata,
-            tokenIsForSale: forSale,
-            loading: false,
-          };
-          setAllNfts((allNfts) => allNfts.set(tokenId, nftDetails));
         })
       );
     };
