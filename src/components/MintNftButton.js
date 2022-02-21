@@ -9,9 +9,35 @@ import { useNotifications } from "@mantine/notifications";
 import { BsFillCheckCircleFill } from "react-icons/bs";
 import { IoAlertCircleSharp } from "react-icons/io5";
 import { useModals } from "@mantine/modals";
-import { useEffect, useState } from "react";
 
-const MintNftForm = ({ setFormValues }) => {
+const mintNft = async ({ currentAccount, image, name, description }) => {
+  const nft = {
+    image: image,
+    name: name,
+    description: description,
+  };
+  const client = new NFTStorage({ token: config.nftStorage.key });
+  const metadata = await client.store(nft);
+  console.log("NFT data stored @", metadata.url);
+  const nftContract = getContract({
+    currentAccount,
+    contractInfo: config.contracts.nftContract,
+  });
+  let txn = await nftContract.safeMint(currentAccount, metadata.url);
+  console.log("Transaction hash for minting the NFT:", txn.hash);
+  const receipt = await txn.wait();
+  console.log("Transaction receipt:", receipt);
+  const transferEvent = receipt.events?.filter((x) => {
+    return x.event === "Transfer";
+  })[0];
+  const tokenId = transferEvent.args[2].toString();
+  console.log("Transaction done, minted token ID:", tokenId);
+  return `https://testnets.opensea.io/assets/mumbai/${config.contracts.nftContract.contractAddress}/${tokenId}`;
+};
+
+const MintNftForm = ({ currentAccount, closeModal }) => {
+  const notifications = useNotifications();
+
   const form = useForm({
     initialValues: {
       name: "",
@@ -24,12 +50,60 @@ const MintNftForm = ({ setFormValues }) => {
     form.setValues({ ...form.values, image: files[0] });
   };
 
-  useEffect(() => {
-    setFormValues(form.values);
-  }, [form.values, setFormValues]);
+  const handleFormSubmit = async (formValues) => {
+    const notificationId = notifications.showNotification({
+      loading: true,
+      title: "Minting your NFT",
+      message: "Minting your NFT, please approve the Metamask transaction",
+      autoClose: false,
+      disallowClose: true,
+    });
+
+    try {
+      const tokenUrl = await mintNft({
+        currentAccount,
+        image: formValues.image,
+        name: formValues.name,
+        description: formValues.description,
+      });
+
+      notifications.updateNotification(notificationId, {
+        notificationId,
+        color: "teal",
+        title: "NFT is minted",
+        message: (
+          <>
+            <Text>You can view your NFT at: </Text>
+            <Anchor href={tokenUrl} target="_blank">
+              {tokenUrl}
+            </Anchor>
+          </>
+        ),
+        icon: <BsFillCheckCircleFill />,
+        autoClose: false,
+        disallowClose: false,
+      });
+    } catch (error) {
+      console.log(error);
+      notifications.updateNotification(notificationId, {
+        notificationId,
+        color: "red",
+        title: "NFT minting failed",
+        message: "An error occurred while minting your NFT",
+        icon: <IoAlertCircleSharp />,
+        autoClose: false,
+        disallowClose: false,
+      });
+    }
+  };
 
   return (
-    <form>
+    <form
+      onSubmit={form.onSubmit((formValues) => {
+        closeModal();
+        handleFormSubmit(formValues);
+      })}
+    >
       <Group direction="column" position="center" grow={true}>
         <TextInput required label="Name" {...form.getInputProps("name")} />
         <TextInput
@@ -57,84 +131,29 @@ const MintNftForm = ({ setFormValues }) => {
             </Group>
           )}
         </Dropzone>
+        <Group position="right">
+          <Button onClick={closeModal} variant="default">
+            Cancel
+          </Button>
+          <Button type="submit">Confirm</Button>
+        </Group>
       </Group>
     </form>
   );
 };
 
 export const MintNftButton = ({ currentAccount, buttonProps, children }) => {
-  const [formValues, setFormValues] = useState(null);
-  const notifications = useNotifications();
   const modals = useModals();
 
-  const mintNft = async (formValues) => {
-    const notificationId = notifications.showNotification({
-      loading: true,
-      title: "Minting your NFT",
-      message: "Minting your NFT, please approve the Metamask transaction",
-      autoClose: false,
-      disallowClose: true,
-    });
-
-    try {
-      const nft = {
-        image: formValues.image,
-        name: formValues.name,
-        description: formValues.description,
-      };
-      const client = new NFTStorage({ token: config.nftStorage.key });
-      const metadata = await client.store(nft);
-      console.log("NFT data stored @", metadata.url);
-      const nftContract = getContract({
-        currentAccount,
-        contractInfo: config.contracts.nftContract,
-      });
-      let txn = await nftContract.safeMint(currentAccount, metadata.url);
-      console.log("Transaction hash for minting the NFT:", txn.hash);
-      const receipt = await txn.wait();
-      console.log("Transaction receipt:", receipt);
-      const transferEvent = receipt.events?.filter((x) => {
-        return x.event === "Transfer";
-      })[0];
-      const tokenId = transferEvent.args[2].toString();
-      console.log("Transaction done, minted token ID:", tokenId);
-      const tokenUrl = `https://testnets.opensea.io/assets/mumbai/${config.contracts.nftContract.contractAddress}/${tokenId}`;
-
-      notifications.updateNotification(notificationId, {
-        notificationId,
-        color: "teal",
-        title: "NFT is minted",
-        message: (
-          <>
-            <Text>You can view your NFT at: </Text>
-            <Anchor href={tokenUrl} target="_blank">
-              {tokenUrl}
-            </Anchor>
-          </>
-        ),
-        icon: <BsFillCheckCircleFill />,
-        autoClose: false,
-        disallowClose: false,
-      });
-    } catch (err) {
-      console.log(err);
-      notifications.updateNotification(notificationId, {
-        notificationId,
-        color: "red",
-        title: "NFT minting failed",
-        message: "An error occurred while minting your NFT",
-        icon: <IoAlertCircleSharp />,
-        autoClose: false,
-        disallowClose: false,
-      });
-    }
-  };
-
   const openMintNftModal = () => {
-    modals.openConfirmModal({
+    const modalId = modals.openModal({
       title: "Mint an NFT",
-      children: <MintNftForm setFormValues={setFormValues} />,
-      onConfirm: () => mintNft(formValues),
+      children: (
+        <MintNftForm
+          currentAccount={currentAccount}
+          closeModal={() => modals.closeModal(modalId)}
+        />
+      ),
     });
   };
 
