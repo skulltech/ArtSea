@@ -1,4 +1,4 @@
-import { Button, Group, TextInput, Text, Image, Anchor } from "@mantine/core";
+import { Button, Group, TextInput, Text, Image } from "@mantine/core";
 import { Dropzone } from "@mantine/dropzone";
 import { useForm } from "@mantine/hooks";
 import { IoImageOutline } from "react-icons/io5";
@@ -32,7 +32,6 @@ const mintNft = async ({ currentAccount, image, name, description }) => {
   })[0];
   const tokenId = transferEvent.args[2].toString();
   console.log("Transaction done, minted token ID:", tokenId);
-  return `https://testnets.opensea.io/assets/mumbai/${config.contracts.nftContract.contractAddress}/${tokenId}`;
 };
 
 const MintNftForm = ({ currentAccount, closeModal }) => {
@@ -60,7 +59,7 @@ const MintNftForm = ({ currentAccount, closeModal }) => {
     });
 
     try {
-      const tokenUrl = await mintNft({
+      await mintNft({
         currentAccount,
         image: formValues.image,
         name: formValues.name,
