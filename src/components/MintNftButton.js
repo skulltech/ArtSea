@@ -70,15 +70,8 @@ const MintNftForm = ({ currentAccount, closeModal }) => {
       notifications.updateNotification(notificationId, {
         notificationId,
         color: "teal",
-        title: "NFT is minted",
-        message: (
-          <>
-            <Text>You can view your NFT at: </Text>
-            <Anchor href={tokenUrl} target="_blank">
-              {tokenUrl}
-            </Anchor>
-          </>
-        ),
+        title: "NFT minted",
+        message: "Your NFT is successfully minted",
         icon: <BsFillCheckCircleFill />,
         autoClose: false,
         disallowClose: false,

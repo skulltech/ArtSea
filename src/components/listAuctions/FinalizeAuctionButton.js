@@ -163,16 +163,15 @@ export const CancelAuctionButton = ({
       tokenId={tokenId}
       ifSell={false}
       progressNotificationProps={{
-        title: "Deleting auction",
-        message:
-          "Cancelling auction, please approve the two Metamask transactions",
+        title: "Cancelling auction",
+        message: "Cancelling auction, please approve the Metamask transaction",
       }}
       errorNotificationProps={{
         title: "Cancelling auction failed",
         message: "An error occurred while cancelling your auction",
       }}
       successNotificationProps={{
-        title: "Delete successful",
+        title: "Cancel successful",
         message: "Successfully cancelled your auction",
       }}
       modalProps={{

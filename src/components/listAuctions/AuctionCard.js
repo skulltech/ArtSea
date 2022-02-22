@@ -41,10 +41,10 @@ export const AuctionCard = ({
         nftId={auctionDetails.tokenId.toString()}
       >
         {highestBidder === zeroAddress ? (
-          <Text>No one has bid on this auction yet</Text>
+          <Text>No bid yet</Text>
         ) : (
           <Text>
-            Current highest bid is of {highestBidAmount} $MATIC by{" "}
+            Highest bid: {highestBidAmount} $MATIC by{" "}
             {currentAccount === highestBidder
               ? "you"
               : minifyAddress(highestBidder)}

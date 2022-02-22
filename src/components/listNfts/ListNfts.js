@@ -1,10 +1,4 @@
-import {
-  Divider,
-  Group,
-  NativeSelect,
-  SimpleGrid,
-  Skeleton,
-} from "@mantine/core";
+import { Group, NativeSelect, SimpleGrid, Skeleton } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { NftCard } from "./NftCard";
 
@@ -44,7 +38,6 @@ export const ListNfts = ({ currentAccount, currentNetwork, allNfts }) => {
         breakpoints={[
           { maxWidth: "lg", cols: 3 },
           { maxWidth: "md", cols: 2 },
-          // { maxWidth: "sm", cols: 1 },
         ]}
       >
         {nftsToShow.map((nft) =>

@@ -70,7 +70,7 @@ const CreateAuctionForm = ({
         notificationId,
         color: "teal",
         title: "Auction created",
-        message: "Auction created",
+        message: "Your item was put on auction",
         icon: <BsFillCheckCircleFill />,
         autoClose: false,
         disallowClose: false,
@@ -80,7 +80,7 @@ const CreateAuctionForm = ({
         notificationId,
         color: "red",
         title: "Auction creation failed",
-        message: "An error occurred while creating auction",
+        message: "An error occurred while creating the auction",
         icon: <IoAlertCircleSharp />,
         autoClose: false,
         disallowClose: false,
@@ -118,7 +118,9 @@ const CreateAuctionForm = ({
           {...form.getInputProps("minBidAmount")}
         />
         <Group position="right">
-          <Button onClick={closeModal}>Cancel</Button>
+          <Button onClick={closeModal} variant="default">
+            Cancel
+          </Button>
           <Button type="submit">Confirm</Button>
         </Group>
       </Group>

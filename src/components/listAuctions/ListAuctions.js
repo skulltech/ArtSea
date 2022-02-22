@@ -1,10 +1,4 @@
-import {
-  Divider,
-  Group,
-  NativeSelect,
-  SimpleGrid,
-  Skeleton,
-} from "@mantine/core";
+import { Group, NativeSelect, SimpleGrid, Skeleton } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { AuctionCard } from "./AuctionCard";
 
@@ -76,7 +70,6 @@ export const ListAuctions = ({
         breakpoints={[
           { maxWidth: "lg", cols: 3 },
           { maxWidth: "md", cols: 2 },
-          // { maxWidth: "sm", cols: 1 },
         ]}
       >
         {auctionsToShow.map((auction) =>
