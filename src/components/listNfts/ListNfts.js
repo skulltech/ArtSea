@@ -30,7 +30,7 @@ export const ListNfts = ({ currentAccount, currentNetwork, allNfts }) => {
 
   return (
     <Group direction="column" grow={true}>
-      <Group position="apart">
+      <Group position="right">
         <NativeSelect
           value={forSaleFilter}
           onChange={(event) => setForSaleFilter(event.currentTarget.value)}
@@ -39,13 +39,12 @@ export const ListNfts = ({ currentAccount, currentNetwork, allNfts }) => {
           required
         />
       </Group>
-      <Divider label="NFTs" />
       <SimpleGrid
         cols={4}
         breakpoints={[
           { maxWidth: "lg", cols: 3 },
           { maxWidth: "md", cols: 2 },
-          { maxWidth: "sm", cols: 1 },
+          // { maxWidth: "sm", cols: 1 },
         ]}
       >
         {nftsToShow.map((nft) =>

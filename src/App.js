@@ -10,6 +10,10 @@ import {
   useMantineTheme,
   Navbar,
   SegmentedControl,
+  Space,
+  Divider,
+  MediaQuery,
+  Burger,
 } from "@mantine/core";
 import { GiAtSea } from "react-icons/gi";
 import { ListNfts } from "./components/listNfts/ListNfts";
@@ -30,6 +34,7 @@ export default function App() {
   const [activeNav, setActiveNav] = useState("marketComponent");
   const [allNfts, setAllNfts] = useState(new OrderedMap());
   const [allAuctions, setAllAuctions] = useState(new OrderedMap());
+  const [navbarOpened, setNavbarOpened] = useState(false);
 
   const theme = useMantineTheme();
 
@@ -358,11 +363,18 @@ export default function App() {
 
   return (
     <AppShell
-      padding="md"
       header={
         <Header height={60} padding="xs">
           <Group position="apart">
             <Group>
+              <MediaQuery largerThan="sm" styles={{ display: "none" }}>
+                <Burger
+                  opened={navbarOpened}
+                  onClick={() => setNavbarOpened((o) => !o)}
+                  size="sm"
+                  color={theme.colors.gray[6]}
+                />
+              </MediaQuery>
               <GiAtSea />
               <Text weight="bold">ArtSea</Text>
               {validNetwork && (
@@ -384,17 +396,24 @@ export default function App() {
           </Group>
         </Header>
       }
+      navbarOffsetBreakpoint="sm"
       navbar={
         metamaskInstalled &&
         currentNetwork &&
         validNetwork && (
-          <Navbar width={{ base: 300 }}>
+          <Navbar
+            width={{ base: 300 }}
+            padding="xs"
+            hiddenBreakpoint="sm"
+            hidden={!navbarOpened}
+          >
             <Navbar.Section>
               <SegmentedControl
                 fullWidth
                 orientation="vertical"
+                color="blue"
                 styles={{
-                  root: { backgroundColor: "inherit" },
+                  root: { backgroundColor: "inherit", marginRight: 8 },
                 }}
                 size="md"
                 data={[
@@ -405,15 +424,30 @@ export default function App() {
                 onChange={setActiveNav}
               />
             </Navbar.Section>
+            <Space h="xl" />
+            <Divider />
+            <Space h="xl" />
+
             <Navbar.Section>
-              <Group direction="column" grow={true}>
+              <Group direction="column" grow={true} spacing="xs">
                 <MintNftButton
                   currentAccount={currentAccount}
-                  buttonProps={{ leftIcon: <HiOutlineCloudUpload /> }}
+                  buttonProps={{
+                    leftIcon: <HiOutlineCloudUpload />,
+                    radius: 50,
+                    sx: { marginRight: 8 },
+                  }}
                 >
                   Mint an NFT
                 </MintNftButton>
-                <CreateAuctionButton>Create Auction</CreateAuctionButton>
+                <CreateAuctionButton
+                  buttonProps={{
+                    radius: 50,
+                    sx: { marginRight: 8 },
+                  }}
+                >
+                  Create Auction
+                </CreateAuctionButton>
               </Group>
             </Navbar.Section>
           </Navbar>

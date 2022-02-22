@@ -55,31 +55,28 @@ export const ListAuctions = ({
 
   return (
     <Group direction="column" grow={true}>
-      <Group position="apart">
-        <Group position="left">
-          <NativeSelect
-            value={creatorFilter}
-            onChange={(event) => setCreatorFilter(event.currentTarget.value)}
-            data={creatorFilterValues}
-            label="Filter by creator"
-            required
-          />
-          <NativeSelect
-            value={bidderFilter}
-            onChange={(event) => setBidderFilter(event.currentTarget.value)}
-            data={bidderFilterValues}
-            label="Filter by bidder"
-            required
-          />
-        </Group>
+      <Group position="right">
+        <NativeSelect
+          value={creatorFilter}
+          onChange={(event) => setCreatorFilter(event.currentTarget.value)}
+          data={creatorFilterValues}
+          label="Filter by creator"
+          required
+        />
+        <NativeSelect
+          value={bidderFilter}
+          onChange={(event) => setBidderFilter(event.currentTarget.value)}
+          data={bidderFilterValues}
+          label="Filter by bidder"
+          required
+        />
       </Group>
-      <Divider />
       <SimpleGrid
         cols={4}
         breakpoints={[
           { maxWidth: "lg", cols: 3 },
           { maxWidth: "md", cols: 2 },
-          { maxWidth: "sm", cols: 1 },
+          // { maxWidth: "sm", cols: 1 },
         ]}
       >
         {auctionsToShow.map((auction) =>
