@@ -14,10 +14,6 @@ const config = {
     },
   },
   networks: {
-    137: {
-      openSeaUrl: configJson.polygonOpenSeaUrl,
-      name: "Polygon",
-    },
     80001: {
       openSeaUrl: configJson.mumbaiOpenSeaUrl,
       name: "Mumbai",

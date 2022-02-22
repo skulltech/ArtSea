@@ -462,8 +462,8 @@ export default function App() {
             ) : (
               <Center>
                 <Text>
-                  Unsupported Network: Please change your network to Polygon or
-                  Mumbai
+                  Unsupported Network: Please change your network to Mumbai, the
+                  Polygon testnet
                 </Text>
               </Center>
             )
