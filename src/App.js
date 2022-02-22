@@ -272,19 +272,23 @@ export default function App() {
     }
   }, [currentAccount, setAllNfts, validNetwork, loadNfts]);
 
-  // Setting up event listeners
+  // Event listener that reloads page on Metamask's account and chain change
   useEffect(() => {
-    // Reload page on Metamask's account and chain change
+    const reloadPage = () => {
+      window.location.reload();
+    };
     if (window.ethereum) {
-      window.ethereum.on("chainChanged", () => {
-        window.location.reload();
-      });
-      window.ethereum.on("accountsChanged", () => {
-        window.location.reload();
-      });
+      window.ethereum.on("chainChanged", reloadPage);
+      window.ethereum.on("accountsChanged", reloadPage);
+      return () => {
+        window.ethereum.removeListener("chainChanged", reloadPage);
+        window.ethereum.removeListener("accountsChanged", reloadPage);
+      };
     }
+  });
 
-    // Listening to smart contract events
+  // Setting up listeners for smart contract events
+  useEffect(() => {
     if (currentAccount && validNetwork) {
       const marketContract = getContract({
         currentAccount,
@@ -358,6 +362,11 @@ export default function App() {
           );
         }
       });
+
+      return () => {
+        marketContract.removeAllListeners();
+        nftContract.removeAllListeners();
+      };
     }
   });
 
