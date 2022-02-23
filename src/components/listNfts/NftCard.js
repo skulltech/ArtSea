@@ -3,7 +3,7 @@ import config from "../../utils/config";
 import { CreateAuctionButton } from "../CreateAuctionButton";
 import { InfoCard } from "../InfoCard";
 
-export const NftCard = ({ nftDetails, currentAccount, currentNetwork }) => {
+export const NftCard = ({ nftDetails, currentNetwork }) => {
   return (
     <InfoCard
       currentNetwork={currentNetwork}

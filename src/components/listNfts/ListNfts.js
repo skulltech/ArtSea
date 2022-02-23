@@ -48,7 +48,6 @@ export const ListNfts = ({ currentAccount, currentNetwork, allNfts }) => {
               nftDetails={nft}
               key={nft.tokenId}
               currentNetwork={currentNetwork}
-              currentAccount={currentAccount}
             />
           )
         )}
