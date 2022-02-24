@@ -107,9 +107,11 @@ export default function App() {
             loading: false,
           };
           setAllNfts((allNfts) =>
-            allNfts.set(tokenId, {
-              ...allNfts.get(tokenId),
-              ...additionalDetails,
+            allNfts.update(tokenId, (value) => {
+              return {
+                ...value,
+                ...additionalDetails,
+              };
             })
           );
         })
@@ -127,9 +129,11 @@ export default function App() {
             console.log(error);
           }
           setAllNfts((allNfts) =>
-            allNfts.set(tokenId, {
-              ...allNfts.get(tokenId),
-              tokenMetadata,
+            allNfts.update(tokenId, (value) => {
+              return {
+                ...value,
+                tokenMetadata,
+              };
             })
           );
         })
@@ -201,9 +205,8 @@ export default function App() {
             console.log(error);
           }
           setAllAuctions((allAuctions) =>
-            allAuctions.set(auctionId, {
-              ...allAuctions.get(auctionId),
-              nftMetadata,
+            allAuctions.update(auctionId, (value) => {
+              return { ...value, nftMetadata };
             })
           );
         })
@@ -251,7 +254,9 @@ export default function App() {
       const nftIds = await Promise.all(
         [...Array(balance).keys()].map(
           async (index) =>
-            await nftContract.tokenOfOwnerByIndex(currentAccount, index)
+            await (
+              await nftContract.tokenOfOwnerByIndex(currentAccount, index)
+            ).toBigInt()
         )
       );
       const nftsMap = nftIds.reduce(
@@ -305,10 +310,13 @@ export default function App() {
         setAllAuctions((allAuctions) => allAuctions.delete(auctionIdParsed));
         if (!sold) {
           const auctionInfo = await marketContract.auctions(auctionIdParsed);
+          const tokenIdParsed = await auctionInfo.tokenId.toBigInt();
           setAllNfts((allNfts) =>
-            allNfts.set(auctionInfo.tokenId, {
-              ...allNfts.get(auctionInfo.tokenId),
-              tokenIsForSale: false,
+            allNfts.update(tokenIdParsed, (value) => {
+              return {
+                ...value,
+                tokenIsForSale: false,
+              };
             })
           );
         }
@@ -324,6 +332,7 @@ export default function App() {
             minBidAmount,
           });
           const auctionIdParsed = await auctionId.toNumber();
+          const tokenIdParsed = await tokenId.toBigInt();
           setAllAuctions((allAuctions) =>
             allAuctions.set(auctionIdParsed, {
               auctionId: auctionIdParsed,
@@ -331,9 +340,11 @@ export default function App() {
             })
           );
           setAllNfts((allNfts) =>
-            allNfts.set(tokenId, {
-              ...allNfts.get(tokenId),
-              tokenIsForSale: true,
+            allNfts.update(tokenIdParsed, (value) => {
+              return {
+                ...value,
+                tokenIsForSale: true,
+              };
             })
           );
           await loadAuctions([auctionIdParsed]);
@@ -348,18 +359,20 @@ export default function App() {
 
       nftContract.on("Transfer", async (from, to, tokenId) => {
         console.log("Transfer event:", { from, to, tokenId });
+        const tokenIdParsed = await tokenId.toBigInt();
         if (from === currentAccount) {
-          setAllNfts((allNfts) => allNfts.delete(tokenId));
+          setAllNfts((allNfts) => allNfts.delete(tokenIdParsed));
         }
         if (to === currentAccount) {
           const collectionName = await nftContract.name();
           setAllNfts(async (allNfts) =>
-            allNfts.set(tokenId, {
+            allNfts.set(tokenIdParsed, {
               tokenId,
               loading: true,
               collectionName,
             })
           );
+          await loadNfts([tokenIdParsed]);
         }
       });
 
