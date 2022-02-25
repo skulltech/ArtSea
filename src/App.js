@@ -14,6 +14,7 @@ import {
   Divider,
   MediaQuery,
   Burger,
+  Button,
 } from "@mantine/core";
 import { GiAtSea } from "react-icons/gi";
 import { ListNfts } from "./components/listNfts/ListNfts";
@@ -26,6 +27,35 @@ import { fetchJson } from "ethers/lib/utils";
 import { MintNftButton } from "./components/MintNftButton";
 import { CreateAuctionButton } from "./components/CreateAuctionButton";
 import { OrderedMap } from "immutable";
+
+const changeNetwork = async () => {
+  try {
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0x13881" }],
+    });
+  } catch (error) {
+    if (error.code === 4902) {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: "0x13881",
+            rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
+            chainName: "Polygon Mumbai",
+            nativeCurrency: {
+              name: "MATIC",
+              symbol: "MATIC",
+              decimals: 18,
+            },
+            blockExplorerUrls: ["https://mumbai.polygonscan.com/"],
+          },
+        ],
+      });
+    }
+    console.error(error);
+  }
+};
 
 export default function App() {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -483,10 +513,15 @@ export default function App() {
               mainContents[activeNav]
             ) : (
               <Center>
-                <Text>
-                  Unsupported Network: Please change your network to Mumbai, the
-                  Polygon testnet
-                </Text>
+                <Group direction="column" align="center">
+                  <Text>
+                    Unsupported Network: Please change your network to Mumbai,
+                    the Polygon testnet
+                  </Text>
+                  <Button onClick={changeNetwork}>
+                    Change Network to Mumbai
+                  </Button>
+                </Group>
               </Center>
             )
           ) : (
